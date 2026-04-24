@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://www.agic.it/favicon.ico" alt="AGIC Logo" width="80"/>
+<img src="logo.svg" alt="AGIC" width="200"/>
 
 # 🚀 Amplify the future!
 
