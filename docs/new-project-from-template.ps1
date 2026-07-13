@@ -38,13 +38,13 @@ param(
 $ErrorActionPreference = "Stop"
 
 # --- Config template (Project dell'org, marcati come template) ---
-# scrum  = #14 agic_scrum_template  (viste sprint, Story Points, Iteration)
-# kanban = #21 agic_kanban_template (viste di flusso, no Story Points/Iteration)
+# scrum  = #8  agic_scrum_template  (viste sprint, Story Points, Iteration)
+# kanban = #9  agic_kanban_template (viste di flusso, no Story Points/Iteration)
 $ORG_LOGIN     = "AgicCompany"
 $OWNER_ID      = "O_kgDODysZfA"             # node id org AgicCompany
 $TEMPLATE_PIDS = @{
-  scrum  = "PVT_kwDOEGS8Mc4BbB9y"          # node id Project #14 (agic_scrum_template)
-  kanban = "PVT_kwDOEGS8Mc4BcYvm"          # node id Project #21 (agic_kanban_template)
+  scrum  = "PVT_kwDODysZfM4BdR2i"          # node id Project #8 (agic_scrum_template)
+  kanban = "PVT_kwDODysZfM4BdR2j"          # node id Project #9 (agic_kanban_template)
 }
 $TEMPLATE_PID  = $TEMPLATE_PIDS[$Method]
 
