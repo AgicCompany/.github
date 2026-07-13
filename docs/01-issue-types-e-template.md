@@ -1,6 +1,6 @@
 # 01 — Issue Types e Template
 
-Come sono organizzati i tipi di issue nell'organizzazione `agic-sandbox` e come funzionano i
+Come sono organizzati i tipi di issue nell'organizzazione `AgicCompany` e come funzionano i
 template (Issue Form) condivisi.
 
 ## Issue Types (tipi di work item)
@@ -22,7 +22,7 @@ il template corrispondente.
 
 ## Issue Template (Issue Form)
 
-I template vivono nella repo speciale **`agic-sandbox/.github`**, in `.github/ISSUE_TEMPLATE/`.
+I template vivono nella repo speciale **`AgicCompany/.github`**, in `.github/ISSUE_TEMPLATE/`.
 Sono **Issue Form** in formato `.yml`: form guidati con campi obbligatori, dropdown e placeholder.
 
 Un template per tipo:

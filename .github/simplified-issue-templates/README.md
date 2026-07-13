@@ -45,8 +45,8 @@ Da quel momento, per quel repo il selettore mostrerà **solo i 7 template sempli
 ```bash
 # clona/entra nel repo di progetto, poi:
 mkdir -p .github/ISSUE_TEMPLATE
-# copia i file semplificati presi da agic-sandbox/.github
-curl -sSL https://raw.githubusercontent.com/agic-sandbox/.github/main/.github/simplified-issue-templates/1-epic.yml -o .github/ISSUE_TEMPLATE/1-epic.yml
+# copia i file semplificati presi da AgicCompany/.github
+curl -sSL https://raw.githubusercontent.com/AgicCompany/.github/main/.github/simplified-issue-templates/1-epic.yml -o .github/ISSUE_TEMPLATE/1-epic.yml
 # ...ripeti per 2-feature.yml ... 7-spike.yml
 git add .github/ISSUE_TEMPLATE && git commit -m "chore: usa issue template semplificati" && git push
 ```

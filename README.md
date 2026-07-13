@@ -1,7 +1,7 @@
-# .github — Default org templates per agic-sandbox
+# .github — Default org templates per AgicCompany
 
 Questa repository **speciale** contiene i file di configurazione condivisi a livello di
-organizzazione **agic-sandbox**. Tutto ciò che si trova qui viene applicato automaticamente a
+organizzazione **AgicCompany**. Tutto ciò che si trova qui viene applicato automaticamente a
 **tutte le repository dell'organizzazione** che non definiscono una propria versione dello stesso file.
 
 > ℹ️ Perché esiste: per definire **una volta sola** i template delle issue (e altri file di
@@ -96,7 +96,7 @@ Questo evita duplicazioni tra form e campi strutturati (utili per filtri e viste
 ## Come si usano
 
 1. In una repo dell'organizzazione vai su **Issues → New issue**
-   (oppure apri `https://github.com/agic-sandbox/<repo>/issues/new/choose`).
+   (oppure apri `https://github.com/AgicCompany/<repo>/issues/new/choose`).
 2. Scegli il tipo di elemento: si apre il **form guidato** corrispondente.
 3. Compila i campi. Quelli contrassegnati come obbligatori vanno valorizzati per poter creare l'issue.
 

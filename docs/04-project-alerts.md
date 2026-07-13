@@ -1,6 +1,6 @@
 # 04 — Project Alerts (automazione allarmi)
 
-Sistema di **allarmi/alert** per i GitHub Projects dell'organizzazione `agic-sandbox`.
+Sistema di **allarmi/alert** per i GitHub Projects dell'organizzazione `AgicCompany`.
 Un campo single-select **🚨 Alert** viene aggiornato automaticamente da una GitHub Action
 in base a un set di regole: gli item che richiedono attenzione risaltano con un badge colorato in
 tutte le viste, senza intervento manuale. Il set di regole si **adatta al metodo** del progetto
@@ -15,7 +15,7 @@ tutte le viste, senza intervento manuale. Il set di regole si **adatta al metodo
 ```mermaid
 flowchart LR
     TPL["Template #14<br/>agic_scrum_template<br/>(campo 🚨 Alert)"] -.->|copyProjectV2| P1["Progetto A"] & P2["Progetto B"] & P3["Progetto C"]
-    subgraph GH["Repo agic-sandbox/.github"]
+    subgraph GH["Repo AgicCompany/.github"]
         WF["workflow project-alerts.yml<br/>(schedule + dispatch)"]
         SCRIPT["scripts/project-alerts.mjs<br/>(motore a regole)"]
         SEC["secret PROJECTS_TOKEN<br/>vars PROJECT_OWNER / OWNER_TYPE"]
@@ -85,7 +85,7 @@ Il workflow usa il secret **`PROJECTS_TOKEN`**: un **PAT classico** con scope `p
 | Perche un PAT dedicato e non un token admin personale? | Privilegio minimo: solo `project`, evita di esporre scope `admin:org` in un repo condiviso. |
 | Perche non una GitHub App? | Sarebbe l'opzione piu robusta (identita macchina), ma richiede setup aggiuntivo; scartata per semplicita. Resta l'evoluzione consigliata. |
 
-Variabili del repo: `PROJECT_OWNER` (= `agic-sandbox`), `OWNER_TYPE` (= `organization`).
+Variabili del repo: `PROJECT_OWNER` (= `AgicCompany`), `OWNER_TYPE` (= `organization`).
 
 ## Viste
 
@@ -109,7 +109,7 @@ Varianti utili:
   schedulato il workflow lo processa in automatico.
 - **Progetto esistente non derivato dal template**: eseguire una-tantum il setup del campo:
   ```
-  PROJECT_OWNER=agic-sandbox PROJECT_NUMBER=<n> node scripts/project-alerts.mjs setup
+  PROJECT_OWNER=AgicCompany PROJECT_NUMBER=<n> node scripts/project-alerts.mjs setup
   ```
   poi ricreare le viste in UI.
 

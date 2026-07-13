@@ -27,7 +27,7 @@ jobs:
       - name: Calcola metriche
         env:
           GITHUB_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
-          PROJECT_OWNER: ${{ vars.PROJECT_OWNER || 'agic-sandbox' }}
+          PROJECT_OWNER: ${{ vars.PROJECT_OWNER || 'AgicCompany' }}
           OWNER_TYPE: ${{ vars.OWNER_TYPE || 'organization' }}
           METRICS_FILE: metrics/velocity.csv
         run: |

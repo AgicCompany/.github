@@ -1,7 +1,7 @@
 # 05 — Automazioni di processo (Digest e Metriche)
 
 Automazioni centralizzate che, come gli [Alert](04-project-alerts.md), girano nel repo `.github`
-e agiscono via API su tutti i progetti dell'organizzazione `agic-sandbox`. Nessuna
+e agiscono via API su tutti i progetti dell'organizzazione `AgicCompany`. Nessuna
 configurazione per progetto: i nuovi progetti vengono coperti automaticamente.
 
 > **Adattamento al metodo**: Digest e Metriche rilevano se il progetto è **Scrum** (ha il campo

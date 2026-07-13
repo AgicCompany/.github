@@ -40,9 +40,9 @@ e, opzionalmente, aggancia subito una repo. Con `-Method` scegli quale template 
 
 ```powershell
 # Scrum (default)
-./new-project-from-template.ps1 -Title "agic-cliente-progetto" -RepoToLink "agic-sandbox/nome-repo"
+./new-project-from-template.ps1 -Title "agic-cliente-progetto" -RepoToLink "AgicCompany/nome-repo"
 # Kanban
-./new-project-from-template.ps1 -Title "agic-cliente-progetto" -Method kanban -RepoToLink "agic-sandbox/nome-repo"
+./new-project-from-template.ps1 -Title "agic-cliente-progetto" -Method kanban -RepoToLink "AgicCompany/nome-repo"
 ```
 
 Cosa fa:

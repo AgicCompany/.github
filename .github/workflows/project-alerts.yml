@@ -1,7 +1,7 @@
 name: Project Alerts
 
 # Valuta le regole di alert su TUTTI i project dell'org che hanno il campo "🚨 Alert"
-# e aggiorna il valore su ogni item. Pensato per girare nel repo agic-sandbox/.github.
+# e aggiorna il valore su ogni item. Pensato per girare nel repo AgicCompany/.github.
 on:
   schedule:
     - cron: '0 6 * * *'   # ogni giorno alle 06:00 UTC
@@ -34,7 +34,7 @@ jobs:
         env:
           # PAT classico con scope "project" + "read:org". NON usare GITHUB_TOKEN: non puo' scrivere i project org.
           GITHUB_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
-          PROJECT_OWNER: ${{ vars.PROJECT_OWNER || 'agic-sandbox' }}
+          PROJECT_OWNER: ${{ vars.PROJECT_OWNER || 'AgicCompany' }}
           PROJECT_NUMBER: ${{ github.event.inputs.project_number }}
           OWNER_TYPE: ${{ vars.OWNER_TYPE || 'organization' }}
         run: |

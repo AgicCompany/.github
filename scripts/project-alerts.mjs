@@ -13,7 +13,7 @@
  *
  * Variabili d'ambiente richieste:
  *   GITHUB_TOKEN     PAT classico con scope "project" (e "read:org" se org). In Actions usare un secret.
- *   PROJECT_OWNER    login dell'owner (es. "agic-sandbox") - sempre richiesto
+ *   PROJECT_OWNER    login dell'owner (es. "AgicCompany") - sempre richiesto
  *   PROJECT_NUMBER   numero del project - richiesto solo per "setup" e "run"
  *   OWNER_TYPE       "organization" (default) oppure "user"
  *
@@ -93,9 +93,9 @@ const ALERT_README_BLOCK = [
   '',
   '_Automazioni centralizzate (repo `.github`): nessuna azione manuale. Dettagli nelle guide collegate._',
   '',
-  '- 🚨 **Alert** — badge colorato sugli item che richiedono attenzione (scaduti, bug critici, impediment, scadenze, item fermi…). Regole complete e attivazione: **[guida Alert](https://github.com/agic-sandbox/.github/blob/main/docs/04-project-alerts.md)**.',
+  '- 🚨 **Alert** — badge colorato sugli item che richiedono attenzione (scaduti, bug critici, impediment, scadenze, item fermi…). Regole complete e attivazione: **[guida Alert](https://github.com/AgicCompany/.github/blob/main/docs/04-project-alerts.md)**.',
   '- 🗓️ **Digest settimanale** — riepilogo dello sprint (On track / At risk / Off track) pubblicato ogni lunedì in *Status updates* (menu `···` del progetto).',
-  '- 📈 **Velocity** — vedi la sezione **📈 Velocity** qui sopra · grafici interattivi nella scheda **Insights**. Dettagli: **[guida Processo](https://github.com/agic-sandbox/.github/blob/main/docs/05-automazioni-processo.md)**.',
+  '- 📈 **Velocity** — vedi la sezione **📈 Velocity** qui sopra · grafici interattivi nella scheda **Insights**. Dettagli: **[guida Processo](https://github.com/AgicCompany/.github/blob/main/docs/05-automazioni-processo.md)**.',
   '',
   '> Per vedere gli alert sul board: vista → `···` → *Fields* → **🚨 Alert**, oppure *Group by* → **🚨 Alert**, oppure filtro `-no:"🚨 Alert"`.',
 ].join('\n');

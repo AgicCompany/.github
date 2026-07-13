@@ -24,7 +24,7 @@
   (Opzionale) se presente, copia anche le draft issue del template.
 
 .ESEMPIO
-  ./new-project-from-template.ps1 -Title "agic-acme-shop" -RepoToLink "agic-sandbox/acme-project"
+  ./new-project-from-template.ps1 -Title "agic-acme-shop" -RepoToLink "AgicCompany/acme-project"
 
 .ESEMPIO
   ./new-project-from-template.ps1 -Title "agic-acme-flow" -Method kanban
@@ -40,8 +40,8 @@ $ErrorActionPreference = "Stop"
 # --- Config template (Project dell'org, marcati come template) ---
 # scrum  = #14 agic_scrum_template  (viste sprint, Story Points, Iteration)
 # kanban = #21 agic_kanban_template (viste di flusso, no Story Points/Iteration)
-$ORG_LOGIN     = "agic-sandbox"
-$OWNER_ID      = "O_kgDOEGS8MQ"             # node id org agic-sandbox
+$ORG_LOGIN     = "AgicCompany"
+$OWNER_ID      = "O_kgDODysZfA"             # node id org AgicCompany
 $TEMPLATE_PIDS = @{
   scrum  = "PVT_kwDOEGS8Mc4BbB9y"          # node id Project #14 (agic_scrum_template)
   kanban = "PVT_kwDOEGS8Mc4BcYvm"          # node id Project #21 (agic_kanban_template)

@@ -1,7 +1,7 @@
-# Processi GitHub — agic-sandbox
+# Processi GitHub — AgicCompany
 
 Documentazione operativa per gestire **progetti, template e issue** nell'organizzazione
-`agic-sandbox` su GitHub, in modo coerente con il modello Scrum gia in uso su Azure DevOps.
+`AgicCompany` su GitHub, in modo coerente con il modello Scrum gia in uso su Azure DevOps.
 
 ## Indice
 
@@ -17,7 +17,7 @@ Documentazione operativa per gestire **progetti, template e issue** nell'organiz
 
 ```mermaid
 flowchart TD
-    ORG["Organizzazione agic-sandbox"]
+    ORG["Organizzazione AgicCompany"]
 
     ORG --> TYPES["Issue Types<br/>(Settings)"]
     ORG --> GH["Repo .github (public)"]

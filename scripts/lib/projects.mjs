@@ -6,7 +6,7 @@
  *
  * Env richieste:
  *   GITHUB_TOKEN / PROJECTS_TOKEN  PAT con scope "project" (+ read:org)
- *   PROJECT_OWNER                  login owner (es. "agic-sandbox")
+ *   PROJECT_OWNER                  login owner (es. "AgicCompany")
  *   OWNER_TYPE                     "organization" (default) | "user"
  *   PROJECT_NUMBER                 opzionale (solo per operazioni su singolo project)
  */

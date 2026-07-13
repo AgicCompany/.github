@@ -20,9 +20,9 @@ import {
 
 const dryRun = process.argv.includes('--dry-run');
 const CSV_FILE = process.env.METRICS_FILE || 'metrics/velocity.csv';
-const CSV_LINK = 'https://github.com/agic-sandbox/.github/blob/main/metrics/velocity.csv';
+const CSV_LINK = 'https://github.com/AgicCompany/.github/blob/main/metrics/velocity.csv';
 const THROUGHPUT_CSV = process.env.THROUGHPUT_FILE || 'metrics/throughput.csv';
-const THROUGHPUT_LINK = 'https://github.com/agic-sandbox/.github/blob/main/metrics/throughput.csv';
+const THROUGHPUT_LINK = 'https://github.com/AgicCompany/.github/blob/main/metrics/throughput.csv';
 const SPRINTS_SHOWN = 6; // ultime N iteration mostrate nel README
 const WEEKS_SHOWN = 6;   // ultime N settimane di throughput mostrate (Kanban)
 
@@ -48,7 +48,7 @@ function buildReadmeBlock(rows) {
 
   const lines = [];
   lines.push('## 📈 Velocity');
-  lines.push(`_Velocity media (SP): **${avgVelocity}** · agg. ${isoDate(startOfTodayUTC())} · [grafici Insights](https://github.com/agic-sandbox/.github/blob/main/docs/05-automazioni-processo.md) · [CSV](${CSV_LINK})_`);
+  lines.push(`_Velocity media (SP): **${avgVelocity}** · agg. ${isoDate(startOfTodayUTC())} · [grafici Insights](https://github.com/AgicCompany/.github/blob/main/docs/05-automazioni-processo.md) · [CSV](${CSV_LINK})_`);
   lines.push('');
   lines.push('| Sprint | Avanzamento | SP | Item |');
   lines.push('|---|---|---|---|');
@@ -72,7 +72,7 @@ function buildThroughputReadmeBlock(rows) {
 
   const lines = [];
   lines.push('## 📈 Throughput');
-  lines.push(`_Item completati/settimana · media **${avgThroughput}** · agg. ${isoDate(startOfTodayUTC())} · [grafici Insights](https://github.com/agic-sandbox/.github/blob/main/docs/05-automazioni-processo.md) · [CSV](${THROUGHPUT_LINK})_`);
+  lines.push(`_Item completati/settimana · media **${avgThroughput}** · agg. ${isoDate(startOfTodayUTC())} · [grafici Insights](https://github.com/AgicCompany/.github/blob/main/docs/05-automazioni-processo.md) · [CSV](${THROUGHPUT_LINK})_`);
   lines.push('');
   lines.push('| Settimana (dal) | Completati |');
   lines.push('|---|---|');

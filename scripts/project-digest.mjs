@@ -86,7 +86,7 @@ function buildBody(ind, velocityRows) {
     for (const r of recent) lines.push(`| ${r.title} | \`${bar(r.pct, 10)}\` ${r.pct}% | ${r.completedSp}/${r.committedSp} |`);
     lines.push('');
   }
-  lines.push('_Generato automaticamente — vedi guide [Alert](https://github.com/agic-sandbox/.github/blob/main/docs/04-project-alerts.md) · [Processo](https://github.com/agic-sandbox/.github/blob/main/docs/05-automazioni-processo.md)._');
+  lines.push('_Generato automaticamente — vedi guide [Alert](https://github.com/AgicCompany/.github/blob/main/docs/04-project-alerts.md) · [Processo](https://github.com/AgicCompany/.github/blob/main/docs/05-automazioni-processo.md)._');
   return lines.join('\n');
 }
 
@@ -142,7 +142,7 @@ function buildKanbanBody(ind, throughputRows) {
     for (const r of recent) lines.push(`| ${r.label} | \`${bar(max > 0 ? (r.completed / max) * 100 : 0, 10)}\` ${r.completed} |`);
     lines.push('');
   }
-  lines.push('_Generato automaticamente — vedi guide [Alert](https://github.com/agic-sandbox/.github/blob/main/docs/04-project-alerts.md) · [Processo](https://github.com/agic-sandbox/.github/blob/main/docs/05-automazioni-processo.md)._');
+  lines.push('_Generato automaticamente — vedi guide [Alert](https://github.com/AgicCompany/.github/blob/main/docs/04-project-alerts.md) · [Processo](https://github.com/AgicCompany/.github/blob/main/docs/05-automazioni-processo.md)._');
   return lines.join('\n');
 }
 
