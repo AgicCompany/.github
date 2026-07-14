@@ -159,7 +159,7 @@ Dettagli operativi: [docs/04 — Project Alerts](docs/04-project-alerts.md) e
 
 ## Documentazione dei processi
 
-Guide operative su progetti, template e issue: vedi [docs/](docs/README.md).
+Guide operative su progetti, template e issue: vedi [docs/](docs/00-README.md).
 
 - [Issue Types e Template](docs/01-issue-types-e-template.md)
 - [Creazione progetti da template](docs/02-creazione-progetti-da-template.md)
