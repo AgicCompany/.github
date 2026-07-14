@@ -15,7 +15,7 @@
   Titolo del nuovo progetto (es. "agic-clienteX-progetto").
 
 .PARAMETRO Method
-  (Opzionale) metodo del progetto: "scrum" (default, template #14) o "kanban" (template #21).
+  (Opzionale) metodo del progetto: "scrum" (default, template #8) o "kanban" (template #9).
 
 .PARAMETRO RepoToLink
   (Opzionale) owner/repo da agganciare automaticamente al nuovo progetto.

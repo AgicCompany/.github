@@ -14,7 +14,7 @@ tutte le viste, senza intervento manuale. Il set di regole si **adatta al metodo
 
 ```mermaid
 flowchart LR
-    TPL["Template #14<br/>agic_scrum_template<br/>(campo 🚨 Alert)"] -.->|copyProjectV2| P1["Progetto A"] & P2["Progetto B"] & P3["Progetto C"]
+    TPL["Template #8 agic_scrum_template<br/>Template #9 agic_kanban_template<br/>(campo 🚨 Alert)"] -.->|copyProjectV2| P1["Progetto A"] & P2["Progetto B"] & P3["Progetto C"]
     subgraph GH["Repo AgicCompany/.github"]
         WF["workflow project-alerts.yml<br/>(schedule + dispatch)"]
         SCRIPT["scripts/project-alerts.mjs<br/>(motore a regole)"]
@@ -55,9 +55,9 @@ riceve al massimo un alert, quello piu importante). Gli item in stato chiuso (`D
 Campo single-select con opzioni colorate, creato via API sui template e **ereditato** dai progetti
 generati da essi. Esistono due palette a seconda del metodo:
 
-- **Scrum** (template #14 `agic_scrum_template`): 8 opzioni (3 rosse, 3 arancioni, 2 gialle),
+- **Scrum** (template #8 `agic_scrum_template`): 8 opzioni (3 rosse, 3 arancioni, 2 gialle),
   incluse le due sprint (*Non pronto per sprint*, *Avanzamento insufficiente*).
-- **Kanban** (template #21 `agic_kanban_template`): 7 opzioni (4 rosse, 3 arancioni), con
+- **Kanban** (template #9 `agic_kanban_template`): 7 opzioni (4 rosse, 3 arancioni), con
   **🔴 Bloccato** al posto delle due sprint.
 
 Il motore mappa le regole alle opzioni **per nome**: se un progetto non espone un'opzione (es. un
