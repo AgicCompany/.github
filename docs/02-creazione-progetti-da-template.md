@@ -3,6 +3,19 @@
 Come creare un nuovo GitHub Project di lavoro a partire da un template dell'organizzazione,
 con viste e campi gia preconfigurati.
 
+## Cosa otterrai
+
+Al termine avrai un **Project board di lavoro gia pronto**, senza configurazione manuale:
+
+- **viste e campi** copiati dal template (Backlog, Sprint/Board, campi Status, Priority, Story
+  Points, ecc. a seconda del metodo);
+- il campo **🚨 Alert** attivo: gli item a rischio verranno evidenziati in automatico dalle
+  automazioni centralizzate;
+- una sezione **⚙️ Automazioni** nella descrizione (README) del board, che spiega cosa fa il sistema;
+- (con lo script `-CreateRepo`) una **repository gia creata e agganciata** al progetto.
+
+> Un **item** e una voce del Project: tipicamente una issue collegata (o una draft creata nel board).
+
 ## I template disponibili
 
 L'organizzazione espone due Project marcati come *template*, a seconda del metodo di gestione:
@@ -48,7 +61,11 @@ e, opzionalmente, aggancia subito una repo. Con `-Method` scegli quale template 
 Cosa fa:
 1. `copyProjectV2` dal template scelto → nuovo progetto con viste e campi gia presenti
 2. (opz.) `linkProjectV2ToRepository` → aggancia la repo indicata
-3. **`setup` Alert** → allinea il campo 🚨 Alert e scrive la sezione *⚙️ Automazioni* nel README del progetto (salta con `-SkipSetup`)
+3. **`setup` Alert** → allinea il campo 🚨 Alert e scrive la sezione *⚙️ Automazioni* nella
+   descrizione (**README del board Project**, non quello della repo — lo si vede aprendo il
+   progetto); si salta con `-SkipSetup`.
+
+A fine esecuzione lo script stampa l'**URL del nuovo progetto**.
 
 #### Prerequisiti
 
@@ -75,6 +92,19 @@ setup Alert — tutto in un comando:
 
 Risultato: progetto da template + repo pronta e agganciata + campo Alert e sezione automazioni
 gia configurati, senza passaggi manuali.
+
+### Verifica il risultato
+
+1. Apri l'**URL** stampato dallo script (o *Organizzazione → Projects*).
+2. Controlla che ci siano le **viste** del template e la vista *🚨 Alert attivi*.
+3. In una vista, verifica la presenza del campo **🚨 Alert** tra i campi.
+4. Nella **descrizione/README del board** (menu `⋯` → *Settings* del progetto) deve comparire la
+   sezione **⚙️ Automazioni**.
+5. Se hai usato `-CreateRepo`, la repository risulta **agganciata** (menu progetto → *Settings →
+   Repositories*).
+
+> Gli alert vengono valorizzati al successivo giro schedulato del workflow (vedi guida 04); non
+> compaiono nell'istante della creazione.
 
 ## Aggiornare progetti gia esistenti
 
