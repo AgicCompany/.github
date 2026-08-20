@@ -23,19 +23,55 @@
 .PARAMETRO IncludeDraftIssues
   (Opzionale) se presente, copia anche le draft issue del template.
 
+.PARAMETRO CreateRepo
+  (Opzionale) se presente, crea la repo indicata in -RepoToLink quando non esiste ancora.
+
+.PARAMETRO RepoVisibility
+  (Opzionale) visibilita della repo creata con -CreateRepo: private (default), public o internal.
+
+.PARAMETRO SkipSetup
+  (Opzionale) salta lo step finale di setup del campo Alert / sezione automazioni sul progetto.
+
 .ESEMPIO
   ./new-project-from-template.ps1 -Title "agic-acme-shop" -RepoToLink "AgicCompany/acme-project"
 
 .ESEMPIO
   ./new-project-from-template.ps1 -Title "agic-acme-flow" -Method kanban
+
+.ESEMPIO
+  # Self-service in un solo passo: crea progetto + crea la repo + esegue il setup Alert
+  ./new-project-from-template.ps1 -Title "agic-acme-shop" -RepoToLink "AgicCompany/acme-project" -CreateRepo
 #>
 param(
   [Parameter(Mandatory=$true)][string]$Title,
   [ValidateSet('scrum','kanban')][string]$Method = 'scrum',
   [string]$RepoToLink,
-  [switch]$IncludeDraftIssues
+  [switch]$IncludeDraftIssues,
+  [switch]$CreateRepo,
+  [ValidateSet('private','public','internal')][string]$RepoVisibility = 'private',
+  [switch]$SkipSetup
 )
 $ErrorActionPreference = "Stop"
+
+# --- Preflight: verifica prerequisiti prima di toccare l'org ---
+function Invoke-Preflight {
+  if(-not (Get-Command gh -ErrorAction SilentlyContinue)){
+    Write-Error "GitHub CLI 'gh' non trovato. Installalo da https://cli.github.com/ e riprova."; exit 1
+  }
+  gh auth status 1>$null 2>$null
+  if($LASTEXITCODE -ne 0){
+    Write-Error "Non risulti autenticato con gh. Esegui: gh auth login"; exit 1
+  }
+  # Verifica scope 'project' (necessario per creare/clonare i Project org).
+  $scopesLine = (gh auth status 2>&1 | Select-String 'Token scopes')
+  if($scopesLine -and ($scopesLine.ToString() -notmatch 'project')){
+    Write-Error "Il token gh non ha lo scope 'project'. Esegui: gh auth refresh -s project -s read:org -s repo"; exit 1
+  }
+  if((-not $SkipSetup) -and (-not (Get-Command node -ErrorAction SilentlyContinue))){
+    Write-Error "Node.js non trovato (serve per il setup Alert). Installa Node 20, oppure rilancia con -SkipSetup."; exit 1
+  }
+}
+Invoke-Preflight
 
 # --- Config template (Project dell'org, marcati come template) ---
 # scrum  = #8  agic_scrum_template  (viste sprint, Story Points, Iteration)
@@ -64,12 +100,45 @@ $p = $res.data.copyProjectV2.projectV2
 if(-not $p){ Write-Error "Copia fallita."; exit 1 }
 Write-Host "OK -> #$($p.number)  $($p.url)"
 
+# --- Creazione repo opzionale (self-service) ---
+if($CreateRepo){
+  if(-not $RepoToLink){ Write-Error "-CreateRepo richiede -RepoToLink 'owner/repo'."; exit 1 }
+  gh api "repos/$RepoToLink" 1>$null 2>$null
+  if($LASTEXITCODE -eq 0){
+    Write-Host "Repo '$RepoToLink' gia esistente: la riuso."
+  } else {
+    Write-Host "Creo la repo '$RepoToLink' ($RepoVisibility)..."
+    gh repo create $RepoToLink "--$RepoVisibility" --add-readme | Out-Null
+    if($LASTEXITCODE -ne 0){ Write-Error "Creazione repo fallita."; exit 1 }
+  }
+}
+
 # --- Aggancio repo opzionale ---
 if($RepoToLink){
   $repoId = gh api "repos/$RepoToLink" --jq '.node_id'
   $ql = 'mutation($p:ID!,$r:ID!){ linkProjectV2ToRepository(input:{projectId:$p, repositoryId:$r}){ repository{ name } } }'
   gh api graphql -f query=$ql -f "p=$($p.id)" -f "r=$repoId" | Out-Null
   Write-Host "Repo '$RepoToLink' agganciata al progetto."
+}
+
+# --- Setup automazioni Alert sul nuovo progetto (idempotente) ---
+if(-not $SkipSetup){
+  $setupScript = Join-Path $PSScriptRoot '..' 'scripts' 'project-alerts.mjs'
+  if(Test-Path $setupScript){
+    Write-Host "Eseguo il setup del campo Alert e della sezione automazioni sul progetto #$($p.number)..."
+    $prevToken = $env:GITHUB_TOKEN; $prevOwner = $env:PROJECT_OWNER; $prevNum = $env:PROJECT_NUMBER
+    try {
+      $env:GITHUB_TOKEN   = gh auth token
+      $env:PROJECT_OWNER  = $ORG_LOGIN
+      $env:PROJECT_NUMBER = "$($p.number)"
+      node $setupScript setup
+      if($LASTEXITCODE -ne 0){ Write-Warning "Setup Alert terminato con errori: verifica manualmente il progetto." }
+    } finally {
+      $env:GITHUB_TOKEN = $prevToken; $env:PROJECT_OWNER = $prevOwner; $env:PROJECT_NUMBER = $prevNum
+    }
+  } else {
+    Write-Warning "Script setup non trovato ($setupScript): salto il setup Alert."
+  }
 }
 
 Write-Host "`nNuovo progetto pronto: $($p.url)"

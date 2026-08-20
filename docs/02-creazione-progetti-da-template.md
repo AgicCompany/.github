@@ -48,8 +48,33 @@ e, opzionalmente, aggancia subito una repo. Con `-Method` scegli quale template 
 Cosa fa:
 1. `copyProjectV2` dal template scelto → nuovo progetto con viste e campi gia presenti
 2. (opz.) `linkProjectV2ToRepository` → aggancia la repo indicata
+3. **`setup` Alert** → allinea il campo 🚨 Alert e scrive la sezione *⚙️ Automazioni* nel README del progetto (salta con `-SkipSetup`)
 
-Prerequisiti: `gh` autenticato con PAT (scope `project`, `read:org`, `repo`).
+#### Prerequisiti
+
+Lo script esegue un **preflight** all'avvio e si ferma con un messaggio chiaro se qualcosa manca.
+Per usarlo servono:
+
+- **PowerShell** (Windows nativo; su macOS/Linux installare PowerShell Core `pwsh`).
+- **[GitHub CLI `gh`](https://cli.github.com/)** installato e autenticato (`gh auth login`).
+- Token `gh` con scope **`project`**, **`read:org`**, **`repo`**. Se manca `project`:
+  `gh auth refresh -s project -s read:org -s repo`.
+- **Node.js 20** (necessario per lo step `setup`; non serve se usi `-SkipSetup`).
+- Eseguire lo script **dentro un clone di `AgicCompany/.github`** (richiama `../scripts/project-alerts.mjs`).
+- Essere **membro dell'organizzazione `AgicCompany`** con i permessi di creare Project e repository.
+
+### Self-service in un solo passo (crea anche la repo)
+
+Con `-CreateRepo` lo script **crea la repo** indicata se non esiste ancora (visibilita `private`
+di default, override con `-RepoVisibility public|internal`), la aggancia al progetto ed esegue il
+setup Alert — tutto in un comando:
+
+```powershell
+./new-project-from-template.ps1 -Title "agic-acme-shop" -RepoToLink "AgicCompany/acme-project" -CreateRepo
+```
+
+Risultato: progetto da template + repo pronta e agganciata + campo Alert e sezione automazioni
+gia configurati, senza passaggi manuali.
 
 ## Aggiornare progetti gia esistenti
 
