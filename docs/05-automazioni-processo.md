@@ -1,4 +1,4 @@
-# 05 — Automazioni di processo (Digest e Metriche)
+# 05 — Automazioni di processo (Digest, Metriche e Conformità)
 
 Automazioni centralizzate che, come gli [Alert](04-project-alerts.md), girano nel repo `.github`
 e agiscono via API su tutti i progetti dell'organizzazione `AgicCompany`. Nessuna
@@ -18,6 +18,7 @@ configurazione per progetto: i nuovi progetti vengono coperti automaticamente.
 | 🚨 Alert | Campo colorato sugli item | Board / viste | 2×/giorno |
 | 🗓️ Digest | Project **status update** (Scrum: sprint · Kanban: flusso) | Menu progetto → *Status updates* | Lunedi 07:00 UTC |
 | 📈 Metriche | **Velocity** (Scrum) o **Throughput** (Kanban) nel README + CSV | README + `metrics/velocity.csv` / `metrics/throughput.csv` | Lunedi 05:00 UTC |
+| 🔍 Conformità | Report **read-only** dei progetti fuori standard | `metrics/conformance.md` / `.csv` | Lunedi 06:00 UTC |
 
 ## 🗓️ Digest settimanale
 
@@ -64,6 +65,30 @@ ereditate dai progetti creati dal template). Per una velocity chart:
 > per **data di completamento** (o settimana) e conteggio degli item `is:done`, per visualizzare
 > quanti item vengono chiusi nel tempo.
 
+## 🔍 Conformità dei progetti (read-only)
+
+- **File**: `scripts/project-conformance.mjs` + `.github/workflows/project-conformance.yml`.
+- **Scopo**: individuare i progetti **fuori standard** — creati a mano invece che dal template —
+  prima che le altre automazioni li saltino in silenzio (es. un progetto senza il campo `🚨 Alert`
+  non riceve alert e nessuno se ne accorge). È **solo lettura**: non modifica mai i progetti.
+- **Cosa verifica** rispetto ai template `#8 agic_scrum` / `#9 agic_kanban`:
+  - **Campi obbligatori** (hard): `Status`, `Priority`, `Severity`, `Effort level`, `🚨 Alert`,
+    `Target date`.
+  - **Opzioni del campo Status** (hard): `Backlog`, `Ready`, `In Progress`, `In Review`, `Done`,
+    `Blocked`, `Removed`.
+  - **Viste attese** (soft, solo warning): set standard Scrum/Kanban (Backlog, board, Roadmap,
+    Bug/Impediment tracking, Alert attivi, ecc.).
+  - Il **metodo** (Scrum/Kanban) è rilevato automaticamente dalla presenza del campo Iteration.
+- **Conformità "hard"**: un progetto è conforme se ha tutti i campi obbligatori e tutte le opzioni
+  Status. Le viste mancanti sono un **warning** e non rompono la conformità (evita falsi positivi).
+- **Output (due forme):**
+  1. **`metrics/conformance.md`** — report leggibile: tabella per progetto (metodo, esito, campi /
+     opzioni / viste mancanti) più una sezione con l'azione consigliata per i non conformi.
+  2. **`metrics/conformance.csv`** — dati grezzi storicizzabili.
+- **Rimedio**: per i progetti non conformi, ricrearli dal template oppure allineare manualmente i
+  campi/opzioni mancanti. La *riparazione automatica* è volutamente **fuori scope** (rischio di
+  scritture indesiderate su progetti reali).
+
 ## Credenziali e configurazione
 
 - Usano il secret **`PROJECTS_TOKEN`** (PAT con scope `project` + `read:org`) e le variabili
@@ -89,5 +114,7 @@ segue il flusso: info progetto → 📈 metrica → ⚙️ impostazioni, per res
 | `scripts/lib/projects.mjs` | Helper condivisi (GraphQL, item, iteration, throughput, README) |
 | `scripts/project-digest.mjs` | Digest → status update (Scrum/Kanban) |
 | `scripts/project-metrics.mjs` | Velocity (Scrum) / Throughput (Kanban) → README + CSV |
+| `scripts/project-conformance.mjs` | Report read-only di conformità → `metrics/conformance.md` + `.csv` |
 | `metrics/velocity.csv` | Dati grezzi velocity (progetti Scrum) |
 | `metrics/throughput.csv` | Dati grezzi throughput settimanale (progetti Kanban) |
+| `metrics/conformance.md` / `.csv` | Report di conformità dei progetti org-wide (read-only) |

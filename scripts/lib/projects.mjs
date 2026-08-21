@@ -111,6 +111,28 @@ export async function getFields(projectId) {
   return byName;
 }
 
+// ---- Views (sola lettura: nome + layout) ----
+export async function getViews(projectId) {
+  const out = [];
+  let cursor = null, hasNext = true;
+  const q = `query($id: ID!, $cursor: String) {
+    node(id: $id) { ... on ProjectV2 {
+      views(first: 50, after: $cursor) {
+        pageInfo { hasNextPage endCursor }
+        nodes { name layout }
+      }
+    } }
+  }`;
+  while (hasNext) {
+    const data = await gql(q, { id: projectId, cursor });
+    const conn = data.node.views;
+    for (const v of conn.nodes) out.push({ name: v.name, layout: v.layout });
+    hasNext = conn.pageInfo.hasNextPage;
+    cursor = conn.pageInfo.endCursor;
+  }
+  return out;
+}
+
 // ---- Items ----
 export async function getAllItems(projectId) {
   const out = [];

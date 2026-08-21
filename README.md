@@ -20,10 +20,12 @@ scripts/                        # logica delle automazioni (Node 20, zero dipend
 ├─ project-alerts.mjs           # calcola/aggiorna il campo 🚨 Alert sugli item dei Project
 ├─ project-digest.mjs           # pubblica lo status update settimanale sui Project
 ├─ project-metrics.mjs          # esporta velocity/throughput per iteration
+├─ project-conformance.mjs      # report read-only dei progetti fuori standard
 └─ lib/projects.mjs             # funzioni condivise (GraphQL, helper Project)
 metrics/
 ├─ velocity.csv                 # storico velocity (progetti Scrum), generato dalle automazioni
-└─ throughput.csv               # storico throughput settimanale (progetti Kanban), generato al 1° run Kanban
+├─ throughput.csv               # storico throughput settimanale (progetti Kanban), generato al 1° run Kanban
+└─ conformance.md / .csv        # report di conformità dei progetti org-wide (read-only)
 docs/                           # guide operative (indice in fondo a questo README)
 README.md                       # questo file
 ```
@@ -148,6 +150,7 @@ eseguiti dai workflow schedulati in `.github/workflows/`:
 | `project-alerts.mjs` | `project-alerts.yml` | Aggiorna il campo `🚨 Alert` sugli item dei Project in base a un set di regole adattato al metodo (Scrum/Kanban): item scaduti, bug critici, impediment, bloccati, ecc. |
 | `project-digest.mjs` | `project-digest.yml` | Pubblica un **digest settimanale** come *status update* del Project |
 | `project-metrics.mjs` | `project-metrics.yml` | Esporta **velocity** (Scrum) o **throughput** settimanale (Kanban) per progetto nel README e in `metrics/velocity.csv` / `metrics/throughput.csv` |
+| `project-conformance.mjs` | `project-conformance.yml` | Genera un **report read-only di conformità** dei progetti rispetto ai template (campi, opzioni Status, viste) in `metrics/conformance.md` / `.csv`; non modifica i progetti |
 
 La logica condivisa (client GraphQL, helper sui Project) sta in `scripts/lib/projects.mjs`. Tutte le
 automazioni usano il secret **`PROJECTS_TOKEN`** (vedi *Requisiti tecnici*).
@@ -165,4 +168,4 @@ Guide operative su progetti, template e issue: vedi [docs/](docs/00-README.md).
 - [Creazione progetti da template](docs/02-creazione-progetti-da-template.md)
 - [Viste e filtri](docs/03-viste-e-filtri.md)
 - [Project Alerts (automazione)](docs/04-project-alerts.md)
-- [Automazioni di processo (digest, metriche)](docs/05-automazioni-processo.md)
+- [Automazioni di processo (digest, metriche, conformità)](docs/05-automazioni-processo.md)

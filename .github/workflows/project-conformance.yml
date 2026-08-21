@@ -1,0 +1,51 @@
+name: Project Conformance
+
+# Report READ-ONLY di conformita' dei progetti org-wide rispetto allo standard dei template
+# (#8 agic_scrum / #9 agic_kanban): campi obbligatori, opzioni Status e viste attese.
+# Non scrive nulla sui progetti: aggiorna solo metrics/conformance.md e metrics/conformance.csv.
+on:
+  schedule:
+    - cron: '0 6 * * 1'   # ogni lunedi alle 06:00 UTC (dopo le metriche)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Esegui senza scrivere/committare (true/false)'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write
+
+jobs:
+  conformance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+
+      - name: Genera report di conformita'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+          PROJECT_OWNER: ${{ vars.PROJECT_OWNER || 'AgicCompany' }}
+          OWNER_TYPE: ${{ vars.OWNER_TYPE || 'organization' }}
+          CONFORMANCE_MD: metrics/conformance.md
+          CONFORMANCE_CSV: metrics/conformance.csv
+        run: |
+          DRY=""
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then DRY="--dry-run"; fi
+          node scripts/project-conformance.mjs $DRY
+
+      - name: Commit report aggiornato
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain metrics/conformance.md metrics/conformance.csv)" ]; then
+            git add metrics/conformance.md metrics/conformance.csv
+            git commit -m "chore: aggiorna report di conformita' progetti [skip ci]"
+            git push
+          else
+            echo "Nessuna variazione nella conformita'."
+          fi

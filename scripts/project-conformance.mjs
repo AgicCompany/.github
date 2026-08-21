@@ -1,0 +1,135 @@
+#!/usr/bin/env node
+// @ts-nocheck
+/*
+ * project-conformance.mjs
+ * Report READ-ONLY di conformita' dei progetti org-wide rispetto allo standard dei template
+ * (#8 agic_scrum / #9 agic_kanban). Serve a individuare i progetti fuori standard (creati a mano,
+ * non da template) prima che le automazioni li saltino in silenzio (es. campo Alert mancante).
+ *
+ * NON scrive nulla sui progetti: produce solo due artefatti nel repo .github:
+ *   - metrics/conformance.md  (report leggibile)
+ *   - metrics/conformance.csv (dati grezzi)
+ *
+ *   node project-conformance.mjs [--dry-run]
+ */
+import { writeFileSync, mkdirSync } from 'node:fs';
+import { dirname } from 'node:path';
+import {
+  CONFIG, listProjects, getFields, getViews, projectMethod,
+  isoDate, startOfTodayUTC, fail,
+} from './lib/projects.mjs';
+
+const dryRun = process.argv.includes('--dry-run');
+const MD_FILE = process.env.CONFORMANCE_MD || 'metrics/conformance.md';
+const CSV_FILE = process.env.CONFORMANCE_CSV || 'metrics/conformance.csv';
+
+// --- Standard atteso, derivato dai template #8/#9 ---
+// Campi obbligatori su ogni progetto conforme (hard check).
+const REQUIRED_FIELDS = ['Status', 'Priority', 'Severity', 'Effort level', '🚨 Alert', 'Target date'];
+// Opzioni complete del campo Status (hard check).
+const REQUIRED_STATUS_OPTIONS = ['Backlog', 'Ready', 'In Progress', 'In Review', 'Done', 'Blocked', 'Removed'];
+// Viste attese per metodo (soft check: segnalate come warning, non rompono la conformita').
+const EXPECTED_VIEWS = {
+  scrum: ['Backlog', 'Sprint backlog', 'Sprint board', 'Sprint breakdown', 'Roadmap', 'Bug tracking', 'Impediment tracking', 'Alert attivi'],
+  kanban: ['Backlog', 'Board', 'Roadmap', 'Bug tracking', 'Impediment tracking', 'Alert attivi'],
+};
+
+const HEADERS = [
+  'snapshot_date', 'project_number', 'project_title', 'method',
+  'conformant', 'missing_fields', 'missing_status_options', 'missing_views',
+];
+
+function csvCell(v) {
+  const s = v == null ? '' : String(v);
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+
+function evaluate(fields, views, method) {
+  const missingFields = REQUIRED_FIELDS.filter(f => !fields[f]);
+  const statusOpts = (fields['Status']?.options || []).map(o => o.name);
+  const missingStatus = REQUIRED_STATUS_OPTIONS.filter(o => !statusOpts.includes(o));
+  const viewNames = views.map(v => v.name);
+  const missingViews = (EXPECTED_VIEWS[method] || []).filter(v => !viewNames.includes(v));
+  // Hard = campi + opzioni Status. Le viste sono un warning soft.
+  const conformant = missingFields.length === 0 && missingStatus.length === 0;
+  return { missingFields, missingStatus, missingViews, conformant };
+}
+
+function buildMarkdown(rows, snapshot) {
+  const nonConf = rows.filter(r => !r.conformant);
+  const withViewGaps = rows.filter(r => r.conformant && r.missingViews.length > 0);
+  const lines = [];
+  lines.push('# Report di conformita\' progetti (org-wide)');
+  lines.push('');
+  lines.push(`_Read-only · agg. ${snapshot} · ${rows.length} progetti analizzati · ${nonConf.length} non conformi_`);
+  lines.push('');
+  lines.push('Standard di riferimento: template **#8 agic_scrum** / **#9 agic_kanban**.');
+  lines.push('La conformita\' "hard" richiede tutti i campi obbligatori e le opzioni Status complete;');
+  lines.push('le viste mancanti sono segnalate come **warning** (non rompono la conformita\').');
+  lines.push('');
+  lines.push('| # | Progetto | Metodo | Conforme | Campi mancanti | Opzioni Status mancanti | Viste mancanti |');
+  lines.push('|---|----------|--------|:--------:|----------------|-------------------------|----------------|');
+  for (const r of rows) {
+    const ok = r.conformant ? '✅' : '❌';
+    lines.push(`| ${r.number} | ${r.title} | ${r.method} | ${ok} | ${r.missingFields.join(', ') || '—'} | ${r.missingStatus.join(', ') || '—'} | ${r.missingViews.join(', ') || '—'} |`);
+  }
+  lines.push('');
+  if (nonConf.length) {
+    lines.push('## ❌ Non conformi — azione consigliata');
+    for (const r of nonConf) {
+      const reasons = [];
+      if (r.missingFields.length) reasons.push(`campi mancanti: ${r.missingFields.join(', ')}`);
+      if (r.missingStatus.length) reasons.push(`opzioni Status mancanti: ${r.missingStatus.join(', ')}`);
+      lines.push(`- **#${r.number} ${r.title}** — ${reasons.join('; ')}. Ricrearlo da template o allineare i campi mancanti.`);
+    }
+    lines.push('');
+  }
+  if (withViewGaps.length) {
+    lines.push('## ⚠️ Viste non standard (warning)');
+    for (const r of withViewGaps) {
+      lines.push(`- **#${r.number} ${r.title}** — viste mancanti: ${r.missingViews.join(', ')}.`);
+    }
+    lines.push('');
+  }
+  return lines.join('\n');
+}
+
+(async () => {
+  const snapshot = isoDate(startOfTodayUTC());
+  const projects = await listProjects();
+  console.log(`Trovati ${projects.length} project (esclusi template e chiusi). Analizzo la conformita'...\n`);
+
+  const rows = [];
+  for (const p of projects) {
+    const fields = await getFields(p.id);
+    const views = await getViews(p.id);
+    const method = projectMethod(fields);
+    const ev = evaluate(fields, views, method);
+    rows.push({ number: p.number, title: p.title, method, ...ev });
+    const flag = ev.conformant ? 'OK ' : 'NON CONFORME';
+    console.log(`#${p.number} [${method}] ${flag} — ${p.title}`);
+    if (ev.missingFields.length) console.log(`    campi mancanti: ${ev.missingFields.join(', ')}`);
+    if (ev.missingStatus.length) console.log(`    opzioni Status mancanti: ${ev.missingStatus.join(', ')}`);
+    if (ev.missingViews.length) console.log(`    viste mancanti (warning): ${ev.missingViews.join(', ')}`);
+  }
+  rows.sort((a, b) => (a.conformant === b.conformant) ? a.number - b.number : (a.conformant ? 1 : -1));
+
+  const csvRows = rows.map(r => [
+    snapshot, r.number, r.title, r.method, r.conformant ? 'yes' : 'no',
+    r.missingFields.join('|'), r.missingStatus.join('|'), r.missingViews.join('|'),
+  ]);
+  const csv = [HEADERS, ...csvRows].map(r => r.map(csvCell).join(',')).join('\n') + '\n';
+  const md = buildMarkdown(rows, snapshot);
+
+  const nonConf = rows.filter(r => !r.conformant).length;
+  if (dryRun) {
+    console.log(`\n[DRY-RUN] ${CSV_FILE}: ${csvRows.length} righe. ${MD_FILE}: report markdown. Anteprima CSV:\n`);
+    console.log(csv.split('\n').slice(0, 6).join('\n'));
+  } else {
+    for (const file of [MD_FILE, CSV_FILE]) mkdirSync(dirname(file), { recursive: true });
+    writeFileSync(CSV_FILE, csv, 'utf8');
+    writeFileSync(MD_FILE, md, 'utf8');
+    console.log(`\nScritti ${MD_FILE} e ${CSV_FILE}.`);
+  }
+  console.log(`\n${rows.length} progetti analizzati, ${nonConf} non conformi.${dryRun ? ' [DRY-RUN]' : ''}`);
+})().catch(e => fail(e.message || e));
