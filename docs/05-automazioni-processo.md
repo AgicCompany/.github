@@ -74,13 +74,16 @@ ereditate dai progetti creati dal template). Per una velocity chart:
 - **Cosa verifica** rispetto ai template `#8 agic_scrum` / `#9 agic_kanban`:
   - **Campi obbligatori** (hard): `Status`, `Priority`, `Severity`, `Effort level`, `🚨 Alert`,
     `Target date`.
-  - **Opzioni del campo Status** (hard): `Backlog`, `Ready`, `In Progress`, `In Review`, `Done`,
-    `Blocked`, `Removed`.
+  - **Opzioni del campo Status** — classificate in quattro casi per evitare falsi positivi:
+    - `standard` → le 7 opzioni standard presenti (`Backlog, Ready, In Progress, In Review, Done, Blocked, Removed`);
+    - `personalizzato` → workflow del cliente diverso ma **voluto** (opzioni custom oltre lo standard) → conforme, segnalato come **warning**;
+    - `incompleto` → sottoinsieme dello standard con opzioni mancanti → **gap** da sanare (blocca la conformità);
+    - `default` → Status di GitHub mai configurato (`Todo/In Progress/Done`) → progetto da allineare (blocca la conformità).
   - **Viste attese** (soft, solo warning): set standard Scrum/Kanban (Backlog, board, Roadmap,
     Bug/Impediment tracking, Alert attivi, ecc.).
   - Il **metodo** (Scrum/Kanban) è rilevato automaticamente dalla presenza del campo Iteration.
-- **Conformità "hard"**: un progetto è conforme se ha tutti i campi obbligatori e tutte le opzioni
-  Status. Le viste mancanti sono un **warning** e non rompono la conformità (evita falsi positivi).
+- **Verdetto**: ✅ conforme · ⚠️ conforme con warning (Status personalizzato o viste mancanti) ·
+  ❌ non conforme (campi mancanti oppure Status `incompleto`/`default`).
 - **Output (due forme):**
   1. **`metrics/conformance.md`** — report leggibile: tabella per progetto (metodo, esito, campi /
      opzioni / viste mancanti) più una sezione con l'azione consigliata per i non conformi.

@@ -28,6 +28,8 @@ const CSV_FILE = process.env.CONFORMANCE_CSV || 'metrics/conformance.csv';
 const REQUIRED_FIELDS = ['Status', 'Priority', 'Severity', 'Effort level', '🚨 Alert', 'Target date'];
 // Opzioni complete del campo Status (hard check).
 const REQUIRED_STATUS_OPTIONS = ['Backlog', 'Ready', 'In Progress', 'In Review', 'Done', 'Blocked', 'Removed'];
+// Set di default di GitHub per un Project mai configurato.
+const GITHUB_DEFAULT_STATUS = ['Todo', 'In Progress', 'Done'];
 // Viste attese per metodo (soft check: segnalate come warning, non rompono la conformita').
 const EXPECTED_VIEWS = {
   scrum: ['Backlog', 'Sprint backlog', 'Sprint board', 'Sprint breakdown', 'Roadmap', 'Bug tracking', 'Impediment tracking', 'Alert attivi'],
@@ -36,7 +38,8 @@ const EXPECTED_VIEWS = {
 
 const HEADERS = [
   'snapshot_date', 'project_number', 'project_title', 'method',
-  'conformant', 'missing_fields', 'missing_status_options', 'missing_views',
+  'conformant', 'status_kind', 'missing_fields', 'missing_status_options',
+  'extra_status_options', 'missing_views',
 ];
 
 function csvCell(v) {
@@ -44,34 +47,59 @@ function csvCell(v) {
   return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
+const sameSet = (a, b) => a.length === b.length && a.every(x => b.includes(x));
+
+// Classifica il campo Status: standard completo, default GitHub mai configurato,
+// standard incompleto (sottoinsieme dello standard) o workflow personalizzato dal cliente.
+function classifyStatus(statusOpts, missingStatus, extraStatus) {
+  if (missingStatus.length === 0) return 'standard';
+  if (sameSet(statusOpts, GITHUB_DEFAULT_STATUS)) return 'default';
+  if (extraStatus.length > 0) return 'personalizzato';
+  return 'incompleto';
+}
+
 function evaluate(fields, views, method) {
   const missingFields = REQUIRED_FIELDS.filter(f => !fields[f]);
   const statusOpts = (fields['Status']?.options || []).map(o => o.name);
   const missingStatus = REQUIRED_STATUS_OPTIONS.filter(o => !statusOpts.includes(o));
+  const extraStatus = statusOpts.filter(o => !REQUIRED_STATUS_OPTIONS.includes(o));
+  const statusKind = classifyStatus(statusOpts, missingStatus, extraStatus);
   const viewNames = views.map(v => v.name);
   const missingViews = (EXPECTED_VIEWS[method] || []).filter(v => !viewNames.includes(v));
-  // Hard = campi + opzioni Status. Le viste sono un warning soft.
-  const conformant = missingFields.length === 0 && missingStatus.length === 0;
-  return { missingFields, missingStatus, missingViews, conformant };
+  // Campi = hard. Status: 'standard'/'personalizzato' passano; 'default'/'incompleto' bloccano.
+  // Uno Status personalizzato e' un workflow cliente voluto -> conforme con warning, non gap.
+  const statusOk = statusKind === 'standard' || statusKind === 'personalizzato';
+  const conformant = missingFields.length === 0 && statusOk;
+  const warnings = [];
+  if (statusKind === 'personalizzato') warnings.push('Status personalizzato (workflow cliente)');
+  if (missingViews.length) warnings.push(`viste mancanti: ${missingViews.join(', ')}`);
+  return { missingFields, missingStatus, extraStatus, statusKind, missingViews, conformant, warnings };
 }
 
 function buildMarkdown(rows, snapshot) {
   const nonConf = rows.filter(r => !r.conformant);
-  const withViewGaps = rows.filter(r => r.conformant && r.missingViews.length > 0);
+  const withWarnings = rows.filter(r => r.conformant && r.warnings.length > 0);
   const lines = [];
   lines.push('# Report di conformita\' progetti (org-wide)');
   lines.push('');
-  lines.push(`_Read-only · agg. ${snapshot} · ${rows.length} progetti analizzati · ${nonConf.length} non conformi_`);
+  lines.push(`_Read-only · agg. ${snapshot} · ${rows.length} progetti analizzati · ${nonConf.length} non conformi · ${withWarnings.length} con warning_`);
   lines.push('');
   lines.push('Standard di riferimento: template **#8 agic_scrum** / **#9 agic_kanban**.');
-  lines.push('La conformita\' "hard" richiede tutti i campi obbligatori e le opzioni Status complete;');
-  lines.push('le viste mancanti sono segnalate come **warning** (non rompono la conformita\').');
+  lines.push('La conformita\' "hard" richiede tutti i campi obbligatori e uno Status **standard** o **personalizzato**.');
   lines.push('');
-  lines.push('| # | Progetto | Metodo | Conforme | Campi mancanti | Opzioni Status mancanti | Viste mancanti |');
-  lines.push('|---|----------|--------|:--------:|----------------|-------------------------|----------------|');
+  lines.push('Classificazione Status:');
+  lines.push('- **standard** — le 7 opzioni standard presenti;');
+  lines.push('- **personalizzato** — workflow del cliente diverso ma voluto → conforme, segnalato come warning;');
+  lines.push('- **incompleto** — sottoinsieme dello standard con opzioni mancanti → gap da sanare;');
+  lines.push('- **default** — Status di GitHub mai configurato (Todo/In Progress/Done) → progetto da allineare.');
+  lines.push('');
+  lines.push('Verdetto: ✅ conforme · ⚠️ conforme con warning · ❌ non conforme.');
+  lines.push('');
+  lines.push('| # | Progetto | Metodo | Verdetto | Status | Campi mancanti | Opzioni Status mancanti | Viste mancanti |');
+  lines.push('|---|----------|--------|:--------:|--------|----------------|-------------------------|----------------|');
   for (const r of rows) {
-    const ok = r.conformant ? '✅' : '❌';
-    lines.push(`| ${r.number} | ${r.title} | ${r.method} | ${ok} | ${r.missingFields.join(', ') || '—'} | ${r.missingStatus.join(', ') || '—'} | ${r.missingViews.join(', ') || '—'} |`);
+    const verdict = !r.conformant ? '❌' : (r.warnings.length ? '⚠️' : '✅');
+    lines.push(`| ${r.number} | ${r.title} | ${r.method} | ${verdict} | ${r.statusKind} | ${r.missingFields.join(', ') || '—'} | ${r.missingStatus.join(', ') || '—'} | ${r.missingViews.join(', ') || '—'} |`);
   }
   lines.push('');
   if (nonConf.length) {
@@ -79,15 +107,16 @@ function buildMarkdown(rows, snapshot) {
     for (const r of nonConf) {
       const reasons = [];
       if (r.missingFields.length) reasons.push(`campi mancanti: ${r.missingFields.join(', ')}`);
-      if (r.missingStatus.length) reasons.push(`opzioni Status mancanti: ${r.missingStatus.join(', ')}`);
-      lines.push(`- **#${r.number} ${r.title}** — ${reasons.join('; ')}. Ricrearlo da template o allineare i campi mancanti.`);
+      if (r.statusKind === 'default') reasons.push('Status di GitHub mai configurato (Todo/In Progress/Done)');
+      else if (r.statusKind === 'incompleto') reasons.push(`opzioni Status mancanti: ${r.missingStatus.join(', ')}`);
+      lines.push(`- **#${r.number} ${r.title}** — ${reasons.join('; ')}. Ricrearlo da template o allineare campi/Status.`);
     }
     lines.push('');
   }
-  if (withViewGaps.length) {
-    lines.push('## ⚠️ Viste non standard (warning)');
-    for (const r of withViewGaps) {
-      lines.push(`- **#${r.number} ${r.title}** — viste mancanti: ${r.missingViews.join(', ')}.`);
+  if (withWarnings.length) {
+    lines.push('## ⚠️ Conformi con warning');
+    for (const r of withWarnings) {
+      lines.push(`- **#${r.number} ${r.title}** — ${r.warnings.join('; ')}.`);
     }
     lines.push('');
   }
@@ -106,22 +135,24 @@ function buildMarkdown(rows, snapshot) {
     const method = projectMethod(fields);
     const ev = evaluate(fields, views, method);
     rows.push({ number: p.number, title: p.title, method, ...ev });
-    const flag = ev.conformant ? 'OK ' : 'NON CONFORME';
-    console.log(`#${p.number} [${method}] ${flag} — ${p.title}`);
+    const flag = !ev.conformant ? 'NON CONFORME' : (ev.warnings.length ? 'WARNING' : 'OK ');
+    console.log(`#${p.number} [${method}] ${flag} — ${p.title} (status: ${ev.statusKind})`);
     if (ev.missingFields.length) console.log(`    campi mancanti: ${ev.missingFields.join(', ')}`);
-    if (ev.missingStatus.length) console.log(`    opzioni Status mancanti: ${ev.missingStatus.join(', ')}`);
+    if (ev.statusKind === 'incompleto') console.log(`    opzioni Status mancanti: ${ev.missingStatus.join(', ')}`);
+    if (ev.statusKind === 'personalizzato') console.log(`    Status personalizzato (workflow cliente): ${ev.extraStatus.join(', ')}`);
     if (ev.missingViews.length) console.log(`    viste mancanti (warning): ${ev.missingViews.join(', ')}`);
   }
   rows.sort((a, b) => (a.conformant === b.conformant) ? a.number - b.number : (a.conformant ? 1 : -1));
 
   const csvRows = rows.map(r => [
-    snapshot, r.number, r.title, r.method, r.conformant ? 'yes' : 'no',
-    r.missingFields.join('|'), r.missingStatus.join('|'), r.missingViews.join('|'),
+    snapshot, r.number, r.title, r.method, r.conformant ? 'yes' : 'no', r.statusKind,
+    r.missingFields.join('|'), r.missingStatus.join('|'), r.extraStatus.join('|'), r.missingViews.join('|'),
   ]);
   const csv = [HEADERS, ...csvRows].map(r => r.map(csvCell).join(',')).join('\n') + '\n';
   const md = buildMarkdown(rows, snapshot);
 
   const nonConf = rows.filter(r => !r.conformant).length;
+  const warn = rows.filter(r => r.conformant && r.warnings.length).length;
   if (dryRun) {
     console.log(`\n[DRY-RUN] ${CSV_FILE}: ${csvRows.length} righe. ${MD_FILE}: report markdown. Anteprima CSV:\n`);
     console.log(csv.split('\n').slice(0, 6).join('\n'));
@@ -131,5 +162,5 @@ function buildMarkdown(rows, snapshot) {
     writeFileSync(MD_FILE, md, 'utf8');
     console.log(`\nScritti ${MD_FILE} e ${CSV_FILE}.`);
   }
-  console.log(`\n${rows.length} progetti analizzati, ${nonConf} non conformi.${dryRun ? ' [DRY-RUN]' : ''}`);
+  console.log(`\n${rows.length} progetti analizzati, ${nonConf} non conformi, ${warn} con warning.${dryRun ? ' [DRY-RUN]' : ''}`);
 })().catch(e => fail(e.message || e));
