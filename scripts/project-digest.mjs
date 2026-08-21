@@ -39,7 +39,7 @@ function computeIndicators(items, fields) {
 
     if (cur && it.iterationId === cur.id) {
       sprintTotal++;
-      const sp = typeof it.storyPoints === 'number' ? it.storyPoints : 0;
+      const sp = typeof it.effort === 'number' ? it.effort : 0;
       spCommitted += sp;
       if (done) { sprintDone++; spCompleted += sp; }
     }

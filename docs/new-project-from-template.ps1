@@ -74,8 +74,8 @@ function Invoke-Preflight {
 Invoke-Preflight
 
 # --- Config template (Project dell'org, marcati come template) ---
-# scrum  = #8  agic_scrum_template  (viste sprint, Story Points, Iteration)
-# kanban = #9  agic_kanban_template (viste di flusso, no Story Points/Iteration)
+# scrum  = #8  agic_scrum_template  (viste sprint, Iteration; stima via Effort (numeric))
+# kanban = #9  agic_kanban_template (viste di flusso, no Iteration; stima via Effort (numeric))
 $ORG_LOGIN     = "AgicCompany"
 $OWNER_ID      = "O_kgDODysZfA"             # node id org AgicCompany
 $TEMPLATE_PIDS = @{

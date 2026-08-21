@@ -22,7 +22,7 @@ export const CONFIG = {
     status: 'Status',
     priority: 'Priority',
     severity: 'Severity',
-    storyPoints: 'Story Points',
+    effort: 'Effort (numeric)',
     targetDate: 'Target date',
     iteration: 'Iteration',
     alert: '🚨 Alert',
@@ -140,6 +140,12 @@ export async function getAllItems(projectId) {
                   issueType { name }
                   labels(first: 20) { nodes { name } }
                   subIssuesSummary { total completed percentCompleted }
+                  issueFieldValues(first: 30) {
+                    nodes {
+                      __typename
+                      ... on IssueFieldNumberValue { value field { ... on IssueFieldCommon { name } } }
+                    }
+                  }
                 }
                 ... on DraftIssue { title createdAt updatedAt }
               }
@@ -188,11 +194,20 @@ function normalizeItem(node) {
     status: fv[N.status] ?? null,
     priority: fv[N.priority] ?? null,
     severity: fv[N.severity] ?? null,
-    storyPoints: fv[N.storyPoints] ?? null,
+    effort: readIssueNumber(c, N.effort),
     targetDate: fv[N.targetDate] ?? null,
     iterationId,
     iterationTitle,
   };
+}
+
+// Legge un issue field numerico (es. "Effort (numeric)") dal content dell'Issue.
+function readIssueNumber(content, name) {
+  const nodes = content?.issueFieldValues?.nodes || [];
+  for (const v of nodes) {
+    if (v.__typename === 'IssueFieldNumberValue' && v.field?.name === name) return v.value;
+  }
+  return null;
 }
 
 // ---- Helpers di tipo/stato ----
@@ -298,7 +313,7 @@ export function velocityByIteration(items, fields) {
     let committedSp = 0, completedSp = 0, committed = 0, completed = 0;
     for (const it of group) {
       committed++;
-      const sp = typeof it.storyPoints === 'number' ? it.storyPoints : 0;
+      const sp = typeof it.effort === 'number' ? it.effort : 0;
       committedSp += sp;
       if (isDone(it)) { completed++; completedSp += sp; }
     }

@@ -22,8 +22,8 @@ L'organizzazione espone due Project marcati come *template*, a seconda del metod
 
 | Template | Metodo | Contenuto |
 |----------|--------|-----------|
-| **`agic_scrum_template`** (#8) | Scrum | 8 viste (Backlog, Sprint backlog/board/breakdown, Roadmap, Bug tracking, Impediment tracking, Alert attivi); campi Status (stati Scrum), Priority, Effort level, **Story Points**, **Iteration**, Severity, Start/Target date, 🚨 Alert |
-| **`agic_kanban_template`** (#9) | Kanban | viste di flusso (Board per Status con WIP, Backlog, Bug tracking, Alert attivi); campi Status (Backlog/Ready/In Progress/In Review/Done/Blocked), Priority, Effort level, Severity, Start/Target date, 🚨 Alert — **senza** Story Points e Iteration |
+| **`agic_scrum_template`** (#8) | Scrum | 8 viste (Backlog, Sprint backlog/board/breakdown, Roadmap, Bug tracking, Impediment tracking, Alert attivi); campi Status (stati Scrum), Priority, Effort level, **Iteration**, Severity, Start/Target date, 🚨 Alert. La **stima** usa l'Issue Field org-level **Effort (numeric)** |
+| **`agic_kanban_template`** (#9) | Kanban | viste di flusso (Board per Status con WIP, Backlog, Bug tracking, Alert attivi); campi Status (Backlog/Ready/In Progress/In Review/Done/Blocked), Priority, Effort level, Severity, Start/Target date, 🚨 Alert — **senza** Iteration (usa il throughput) |
 
 Entrambi partono con **0 item** (sono puliti). Scegli quello adatto al metodo del progetto.
 

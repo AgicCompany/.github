@@ -43,7 +43,7 @@ riceve al massimo un alert, quello piu importante). Gli item in stato chiuso (`D
 | 5 | 🟠 In scadenza | arancio | tutti | `Target date` entro pochi giorni | <= 3 giorni |
 | 6 | 🟠 Fermo | arancio | tutti | Stato In Progress/In Review senza aggiornamenti | > 5 giorni |
 | 7 | 🟠 Priorita alta in backlog | arancio | tutti | `Priority` alta + stato backlog da troppo tempo | > 5 giorni |
-| 8 | 🟡 Non pronto per sprint | giallo | Scrum | Item nello sprint corrente senza Story Points o senza assegnatario | — |
+| 8 | 🟡 Non pronto per sprint | giallo | Scrum | Item nello sprint corrente senza stima (`Effort (numeric)`) o senza assegnatario | — |
 | 9 | 🟡 Avanzamento insufficiente | giallo | Scrum | Epic/Feature nello sprint, a sprint quasi concluso, con sub-issue completate sotto soglia | sprint > 70% trascorso, progresso < 50% |
 
 > L'ordine in tabella riflette la priorita usata dal motore (1 = piu alta). Le regole **Scrum**

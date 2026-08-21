@@ -54,7 +54,7 @@ const CONFIG = {
   parentTypes: ['Epic', 'Feature'],
 
   // --- Requisiti di "readiness" per item nello sprint corrente (5) ---
-  requireStoryPoints: true,
+  requireEstimate: true,
   requireAssignee: true,
 
   // --- Nomi dei campi sul progetto (cambia solo se li hai rinominati) ---
@@ -63,7 +63,7 @@ const CONFIG = {
     status: 'Status',
     priority: 'Priority',
     severity: 'Severity',
-    storyPoints: 'Story Points',
+    effort: 'Effort (numeric)',
     targetDate: 'Target date',
     iteration: 'Iteration',
   },
@@ -372,9 +372,9 @@ function evaluate(it, ctx) {
 
   // (5) Item nello sprint corrente non pronto
   if (ctx.currentIterationId && it.iterationId === ctx.currentIterationId) {
-    const missingSP = CONFIG.requireStoryPoints && (it.storyPoints == null);
+    const missingEstimate = CONFIG.requireEstimate && (it.effort == null);
     const missingAssignee = CONFIG.requireAssignee && (it.assignees === 0);
-    if (missingSP || missingAssignee) return 'not_ready';
+    if (missingEstimate || missingAssignee) return 'not_ready';
   }
 
   // (8) Epic/Feature in ritardo a sprint quasi concluso
@@ -426,6 +426,12 @@ async function getAllItems(projectId) {
                   issueType { name }
                   labels(first: 20) { nodes { name } }
                   subIssuesSummary { total completed percentCompleted }
+                  issueFieldValues(first: 30) {
+                    nodes {
+                      __typename
+                      ... on IssueFieldNumberValue { value field { ... on IssueFieldCommon { name } } }
+                    }
+                  }
                 }
                 ... on DraftIssue { title createdAt updatedAt }
               }
@@ -470,11 +476,20 @@ function normalizeItem(node) {
     status: fv[N.status] ?? null,
     priority: fv[N.priority] ?? null,
     severity: fv[N.severity] ?? null,
-    storyPoints: fv[N.storyPoints] ?? null,
+    effort: readIssueNumber(c, N.effort),
     targetDate: fv[N.targetDate] ?? null,
     iterationId,
     alert: fv[N.alert] ?? null,
   };
+}
+
+// Legge un issue field numerico (es. "Effort (numeric)") dal content dell'Issue.
+function readIssueNumber(content, name) {
+  const nodes = content?.issueFieldValues?.nodes || [];
+  for (const v of nodes) {
+    if (v.__typename === 'IssueFieldNumberValue' && v.field?.name === name) return v.value;
+  }
+  return null;
 }
 
 // ===================== Mutations =====================

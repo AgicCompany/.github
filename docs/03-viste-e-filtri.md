@@ -5,8 +5,8 @@ e — a seconda del metodo — sprint (Scrum) o flusso continuo (Kanban).
 
 > Vale per entrambi i template dell'organizzazione: **`agic_scrum_template`** (#8) e
 > **`agic_kanban_template`** (#9). Partono da set di viste diversi (vedi sotto): lo Scrum ha viste
-> per sprint e Story Points, il Kanban un set piu snello centrato sul flusso. Per creare un
-> progetto da template vedi [guida 02](02-creazione-progetti-da-template.md).
+> per sprint e stima (**Effort (numeric)**), il Kanban un set piu snello centrato sul flusso. Per
+> creare un progetto da template vedi [guida 02](02-creazione-progetti-da-template.md).
 
 ## Viste del template Scrum
 
@@ -24,7 +24,7 @@ e — a seconda del metodo — sprint (Scrum) o flusso continuo (Kanban).
 ## Viste del template Kanban
 
 Il template Kanban ha un set piu snello, centrato sul **flusso** anziche sugli sprint: niente
-Iteration ne Story Points.
+Iteration (la stima **Effort (numeric)** resta disponibile come Issue Field).
 
 | Vista | Layout | Filtro | Note |
 |-------|--------|--------|------|

@@ -23,7 +23,7 @@ configurazione per progetto: i nuovi progetti vengono coperti automaticamente.
 
 - **File**: `scripts/project-digest.mjs` + `.github/workflows/project-digest.yml`.
 - **Scrum** — pubblica una **Project status update** con:
-  - sprint corrente (item e Story Points completati su totali, % completamento);
+  - sprint corrente (item e stima `Effort (numeric)` completati su totali, % completamento);
   - conteggio di scaduti, in scadenza, impediment aperti, item in corso;
   - mini-tabella **velocity** degli ultimi sprint.
 - **Kanban** — pubblica una status update di **flusso** con:
@@ -38,8 +38,8 @@ configurazione per progetto: i nuovi progetti vengono coperti automaticamente.
 ## 📈 Metriche / Velocity (Scrum) e Throughput (Kanban)
 
 - **File**: `scripts/project-metrics.mjs` + `.github/workflows/project-metrics.yml`.
-- **Scrum** — per ogni iteration: Story Points previsti/completati, item previsti/completati,
-  % completamento; velocity media (SP completati) sugli ultimi sprint.
+- **Scrum** — per ogni iteration: stima `Effort (numeric)` prevista/completata, item previsti/completati,
+  % completamento; velocity media (effort completato) sugli ultimi sprint.
 - **Kanban** — per ogni settimana ISO: numero di item **completati** (throughput), con media
   settimanale. Basato su `closedAt` (fallback `updatedAt`).
 - **Output (sempre due forme):**
@@ -56,7 +56,7 @@ ereditate dai progetti creati dal template). Per una velocity chart:
 
 1. Apri il progetto → scheda **Insights** → **New chart**.
 2. Layout **Column** (o Bar).
-3. Asse X: **Iteration**; Asse Y: **Sum** di **Story Points**.
+3. Asse X: **Iteration**; Asse Y: **Sum** di **Effort (numeric)**.
 4. Filtro: `is:done` (o `Status:Done`) per la velocity dei soli completati.
 5. Salva con nome **Velocity**. Aggiungi una seconda chart *committed vs done* se utile.
 
