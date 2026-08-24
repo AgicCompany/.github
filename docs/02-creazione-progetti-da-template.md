@@ -106,6 +106,31 @@ gia configurati, senza passaggi manuali.
 > Gli alert vengono valorizzati al successivo giro schedulato del workflow (vedi guida 04); non
 > compaiono nell'istante della creazione.
 
+## Popolamento automatico del board (Auto-add to project)
+
+Collegare una repo al progetto (*link*) **non** basta a portare le issue sul board: il collegamento
+serve solo a far comparire il progetto tra le scelte quando aggiungi manualmente un item. Perché ogni
+nuova issue della repo finisca **da sola** sul board occorre attivare il workflow nativo di GitHub
+**Auto-add to project**.
+
+> ⚠️ Va configurato **su ogni progetto, a mano dalla UI**. GitHub non lo espone via API: quindi
+> **non** viene ereditato dal template e **non** è automatizzabile con i nostri script. Ricordati di
+> attivarlo ogni volta che crei un nuovo progetto.
+
+Come attivarlo (una sola volta, per ciascun progetto):
+1. Apri il progetto → menu `⋯` → **Workflows**.
+2. Scegli **Auto-add to project**.
+3. Indica la repository e imposta il filtro (es. `is:issue` per aggiungere solo le issue).
+4. Premi **Enable**.
+
+Attenzione a non confonderlo con due meccanismi che agiscono in modo diverso:
+- **Auto-add sub-issues** (già attivo di default sul board): quando un item entra nel progetto,
+  ci porta anche le sue sub-issue. **Non** aggiunge però issue nuove e slegate da un parent.
+- Campo **Projects** sulla singola issue: la aggiunge al board manualmente, una per una.
+
+Se il progetto segue lo schema **1 repo → 1 board**, *Auto-add to project* è il modo più comodo per
+non doverti ricordare di agganciare le issue una alla volta.
+
 ## Aggiornare progetti gia esistenti
 
 | Cosa vuoi propagare | Possibile dopo la creazione? |
