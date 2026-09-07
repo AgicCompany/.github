@@ -1,6 +1,6 @@
 # Report di conformita' progetti (org-wide)
 
-_Read-only · agg. 2026-08-31 · 11 progetti analizzati · 8 non conformi · 1 con warning_
+_Read-only · agg. 2026-09-07 · 15 progetti analizzati · 11 non conformi · 2 con warning_
 
 Standard di riferimento: template **#8 agic_scrum** / **#9 agic_kanban**.
 La conformita' "hard" richiede tutti i campi obbligatori e uno Status **standard** o **personalizzato**.
@@ -23,9 +23,13 @@ Verdetto: ✅ conforme · ⚠️ conforme con warning · ❌ non conforme.
 | 18 | isok-bcproject | kanban | ❌ | incompleto | — | Removed | — |
 | 19 | ferroli/hydra | kanban | ❌ | default | Target date | Backlog, Ready, In Review, Blocked, Removed | Backlog, Board, Roadmap, Bug tracking, Impediment tracking, Alert attivi |
 | 20 | ucan/servizi_al_cittadino | scrum | ❌ | default | Target date | Backlog, Ready, In Review, Blocked, Removed | Backlog, Sprint backlog, Sprint board, Sprint breakdown, Roadmap, Bug tracking, Impediment tracking, Alert attivi |
+| 23 | alperia-lava | kanban | ❌ | incompleto | — | Removed | — |
+| 24 | ferroli-hydra | kanban | ❌ | incompleto | — | Removed | — |
+| 25 | isoki-bc_customization | kanban | ❌ | incompleto | — | Removed | — |
 | 10 | GitHub Adoption | kanban | ✅ | standard | — | — | — |
 | 13 | Isokinetic Implementation | kanban | ✅ | standard | — | — | — |
 | 21 | ce-demo/esa_germany | scrum | ⚠️ | personalizzato | — | Backlog, Ready, In Review, Blocked | — |
+| 26 | ucan-servizi_al_cittadino | scrum | ⚠️ | personalizzato | — | Backlog, Ready, In Review, Blocked | — |
 
 ## ❌ Non conformi — azione consigliata
 - **#1 @KeyserDSoze's untitled project** — campi mancanti: Priority, Severity, Effort level, 🚨 Alert, Target date; Status di GitHub mai configurato (Todo/In Progress/Done). Ricrearlo da template o allineare campi/Status.
@@ -36,6 +40,10 @@ Verdetto: ✅ conforme · ⚠️ conforme con warning · ❌ non conforme.
 - **#18 isok-bcproject** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
 - **#19 ferroli/hydra** — campi mancanti: Target date; Status di GitHub mai configurato (Todo/In Progress/Done). Ricrearlo da template o allineare campi/Status.
 - **#20 ucan/servizi_al_cittadino** — campi mancanti: Target date; Status di GitHub mai configurato (Todo/In Progress/Done). Ricrearlo da template o allineare campi/Status.
+- **#23 alperia-lava** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
+- **#24 ferroli-hydra** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
+- **#25 isoki-bc_customization** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
 
 ## ⚠️ Conformi con warning
 - **#21 ce-demo/esa_germany** — Status personalizzato (workflow cliente).
+- **#26 ucan-servizi_al_cittadino** — Status personalizzato (workflow cliente).
