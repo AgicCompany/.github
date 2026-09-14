@@ -1,6 +1,6 @@
 # Report di conformita' progetti (org-wide)
 
-_Read-only · agg. 2026-09-07 · 15 progetti analizzati · 11 non conformi · 2 con warning_
+_Read-only · agg. 2026-09-14 · 15 progetti analizzati · 11 non conformi · 2 con warning_
 
 Standard di riferimento: template **#8 agic_scrum** / **#9 agic_kanban**.
 La conformita' "hard" richiede tutti i campi obbligatori e uno Status **standard** o **personalizzato**.
