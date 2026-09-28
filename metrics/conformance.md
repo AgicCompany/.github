@@ -1,6 +1,6 @@
 # Report di conformita' progetti (org-wide)
 
-_Read-only · agg. 2026-09-21 · 15 progetti analizzati · 11 non conformi · 2 con warning_
+_Read-only · agg. 2026-09-28 · 16 progetti analizzati · 11 non conformi · 3 con warning_
 
 Standard di riferimento: template **#8 agic_scrum** / **#9 agic_kanban**.
 La conformita' "hard" richiede tutti i campi obbligatori e uno Status **standard** o **personalizzato**.
@@ -30,6 +30,7 @@ Verdetto: ✅ conforme · ⚠️ conforme con warning · ❌ non conforme.
 | 13 | Isokinetic Implementation | kanban | ✅ | standard | — | — | — |
 | 21 | ce-demo/esa_germany | scrum | ⚠️ | personalizzato | — | Backlog, Ready, In Review, Blocked | — |
 | 26 | ucan-servizi_al_cittadino | scrum | ⚠️ | personalizzato | — | Backlog, Ready, In Review, Blocked | — |
+| 28 | ce-demo/acquedotto_lucano | scrum | ⚠️ | personalizzato | — | Backlog, Ready, In Review, Blocked | — |
 
 ## ❌ Non conformi — azione consigliata
 - **#1 @KeyserDSoze's untitled project** — campi mancanti: Priority, Severity, Effort level, 🚨 Alert, Target date; Status di GitHub mai configurato (Todo/In Progress/Done). Ricrearlo da template o allineare campi/Status.
@@ -47,3 +48,4 @@ Verdetto: ✅ conforme · ⚠️ conforme con warning · ❌ non conforme.
 ## ⚠️ Conformi con warning
 - **#21 ce-demo/esa_germany** — Status personalizzato (workflow cliente).
 - **#26 ucan-servizi_al_cittadino** — Status personalizzato (workflow cliente).
+- **#28 ce-demo/acquedotto_lucano** — Status personalizzato (workflow cliente).
