@@ -1,6 +1,6 @@
 # Report di conformita' progetti (org-wide)
 
-_Read-only · agg. 2026-09-28 · 16 progetti analizzati · 11 non conformi · 3 con warning_
+_Read-only · agg. 2026-10-05 · 19 progetti analizzati · 14 non conformi · 3 con warning_
 
 Standard di riferimento: template **#8 agic_scrum** / **#9 agic_kanban**.
 La conformita' "hard" richiede tutti i campi obbligatori e uno Status **standard** o **personalizzato**.
@@ -26,6 +26,9 @@ Verdetto: ✅ conforme · ⚠️ conforme con warning · ❌ non conforme.
 | 23 | alperia-lava | kanban | ❌ | incompleto | — | Removed | — |
 | 24 | ferroli-hydra | kanban | ❌ | incompleto | — | Removed | — |
 | 25 | isoki-bc_customization | kanban | ❌ | incompleto | — | Removed | — |
+| 29 | Agic-chiomenti-github | kanban | ❌ | incompleto | — | Removed | — |
+| 30 | chiome-legal_pricing_assistant | kanban | ❌ | incompleto | — | Removed | — |
+| 31 | dedagroup-agent_data_platform | kanban | ❌ | incompleto | — | Removed | — |
 | 10 | GitHub Adoption | kanban | ✅ | standard | — | — | — |
 | 13 | Isokinetic Implementation | kanban | ✅ | standard | — | — | — |
 | 21 | ce-demo/esa_germany | scrum | ⚠️ | personalizzato | — | Backlog, Ready, In Review, Blocked | — |
@@ -44,6 +47,9 @@ Verdetto: ✅ conforme · ⚠️ conforme con warning · ❌ non conforme.
 - **#23 alperia-lava** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
 - **#24 ferroli-hydra** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
 - **#25 isoki-bc_customization** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
+- **#29 Agic-chiomenti-github** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
+- **#30 chiome-legal_pricing_assistant** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
+- **#31 dedagroup-agent_data_platform** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
 
 ## ⚠️ Conformi con warning
 - **#21 ce-demo/esa_germany** — Status personalizzato (workflow cliente).
