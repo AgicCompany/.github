@@ -108,3 +108,7 @@ In questa organizzazione GitHub pubblichiamo:
 *© AGIC Technology S.p.A. — [agic.it](https://www.agic.it)*
 
 </div>
+
+## GitHub Copilot
+
+- [Modelli GitHub Copilot disponibili](https://github.com/AgicCompany/.github/blob/main/copilot-models.md)
