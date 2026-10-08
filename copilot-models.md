@@ -6,6 +6,7 @@ Modelli abilitati per l'enterprise AGIC, con costo e quando usarli.
 | Modello | Costo input / output\* | Quando usarlo | Ruolo |
 | --- | --- | --- | --- |
 | **GPT-6 Luna** | **$0,10 / $0,50**<br>$0,20 / $0,75 >272K | Coding quotidiano, modifiche circoscritte, test, documentazione, SQL, piccoli bug e task ripetitivi | **Default economico e veloce** |
+| **Claude Haiku 5.5** | **$0,10 / $0,50**<br>$0,50 / $2,50 >100K | Coding quotidiano, modifiche circoscritte e piccoli task ripetitivi quando si preferisce un'alternativa Anthropic veloce | **Default economico e veloce** |
 | **Claude Sonnet 5.5** | **$2 / $10** | Feature, debugging, refactor, task multi-file e Agent Mode | **Default per il lavoro più strutturato** |
 | **GPT-6 Sol** | **$2 / $10**<br>$4 / $15 >272K | Problemi complessi, debugging difficile, architettura, migrazioni e reasoning elevato | **Escalation per task complessi** |
 | **Claude Opus 5.5** | **$4 / $20** | Task particolarmente difficili, agent di lunga durata, problemi ambigui o già falliti con altri modelli | **Escalation avanzata** |
