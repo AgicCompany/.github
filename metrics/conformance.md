@@ -1,6 +1,6 @@
 # Report di conformita' progetti (org-wide)
 
-_Read-only · agg. 2026-10-05 · 19 progetti analizzati · 14 non conformi · 3 con warning_
+_Read-only · agg. 2026-10-12 · 24 progetti analizzati · 16 non conformi · 4 con warning_
 
 Standard di riferimento: template **#8 agic_scrum** / **#9 agic_kanban**.
 La conformita' "hard" richiede tutti i campi obbligatori e uno Status **standard** o **personalizzato**.
@@ -27,13 +27,18 @@ Verdetto: ✅ conforme · ⚠️ conforme con warning · ❌ non conforme.
 | 24 | ferroli-hydra | kanban | ❌ | incompleto | — | Removed | — |
 | 25 | isoki-bc_customization | kanban | ❌ | incompleto | — | Removed | — |
 | 29 | Agic-chiomenti-github | kanban | ❌ | incompleto | — | Removed | — |
-| 30 | chiome-legal_pricing_assistant | kanban | ❌ | incompleto | — | Removed | — |
 | 31 | dedagroup-agent_data_platform | kanban | ❌ | incompleto | — | Removed | — |
+| 32 | bricofer-startrade | kanban | ❌ | incompleto | — | Removed | — |
+| 33 | enpav-sirena | kanban | ❌ | incompleto | — | Removed | — |
+| 38 | Internal.bc_workflow | kanban | ❌ | incompleto | — | Removed | — |
 | 10 | GitHub Adoption | kanban | ✅ | standard | — | — | — |
 | 13 | Isokinetic Implementation | kanban | ✅ | standard | — | — | — |
 | 21 | ce-demo/esa_germany | scrum | ⚠️ | personalizzato | — | Backlog, Ready, In Review, Blocked | — |
 | 26 | ucan-servizi_al_cittadino | scrum | ⚠️ | personalizzato | — | Backlog, Ready, In Review, Blocked | — |
 | 28 | ce-demo/acquedotto_lucano | scrum | ⚠️ | personalizzato | — | Backlog, Ready, In Review, Blocked | — |
+| 30 | chiome-legal_pricing_assistant | kanban | ✅ | standard | — | — | — |
+| 34 | ce-demo/universita_bicocca | scrum | ⚠️ | personalizzato | — | Backlog, Ready, In Review, Blocked | — |
+| 36 | stevanato-myspace3_0 | kanban | ✅ | standard | — | — | — |
 
 ## ❌ Non conformi — azione consigliata
 - **#1 @KeyserDSoze's untitled project** — campi mancanti: Priority, Severity, Effort level, 🚨 Alert, Target date; Status di GitHub mai configurato (Todo/In Progress/Done). Ricrearlo da template o allineare campi/Status.
@@ -48,10 +53,13 @@ Verdetto: ✅ conforme · ⚠️ conforme con warning · ❌ non conforme.
 - **#24 ferroli-hydra** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
 - **#25 isoki-bc_customization** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
 - **#29 Agic-chiomenti-github** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
-- **#30 chiome-legal_pricing_assistant** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
 - **#31 dedagroup-agent_data_platform** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
+- **#32 bricofer-startrade** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
+- **#33 enpav-sirena** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
+- **#38 Internal.bc_workflow** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
 
 ## ⚠️ Conformi con warning
 - **#21 ce-demo/esa_germany** — Status personalizzato (workflow cliente).
 - **#26 ucan-servizi_al_cittadino** — Status personalizzato (workflow cliente).
 - **#28 ce-demo/acquedotto_lucano** — Status personalizzato (workflow cliente).
+- **#34 ce-demo/universita_bicocca** — Status personalizzato (workflow cliente).
