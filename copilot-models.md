@@ -12,9 +12,10 @@ Modelli abilitati per l'enterprise AGIC, con costo e quando usarli.
 | **Claude Opus 5.5** | **$4 / $20** | Task particolarmente difficili, agent di lunga durata, problemi ambigui o già falliti con altri modelli | **Escalation avanzata** |
 | **MAI-Code-1.1-Flash** | **$0,20 / $1,20** | Coding rapido, task chiari e ripetitivi | **Add-on economico** |
 | **Gemini 3.8 Flash** | **$0,75 / $3,75**<br>🏷️ promo fino al 31/12/2026 | Task veloci, prototipazione e trasformazioni semplici | **Add-on orientato alla velocità** |
+| **Gemini 4 Argon** | **$2 / $10**<br>🏷️ promo fino al 01/12/2026 | Reasoning complesso e task multi-step in cui un modello Google è più adatto del default<br>⚠️ Il prezzo promozionale termina il 2026-12-01 e il prezzo post-promo non è pubblicato; rivalutare quando lo sarà | **Add-on Google potente** |
 | **Grok 4.7** | **$2 / $6**<br>$4 / $12 >200K | Workflow agentici e problem solving multi-step | **Add-on / alternativa di provider** |
 | **Kimi K3** | **$3 / $15** | Codebase molto grandi, contesto esteso e workflow agentici lunghi | **Add-on per long context** |
 
-_Aggiornato il 08/10/2026. Fonte: [config/copilot-models.yaml](https://github.com/AgicCompany/org-github-management/blob/main/config/copilot-models.yaml)._
+_Aggiornato il 14/10/2026. Fonte: [config/copilot-models.yaml](https://github.com/AgicCompany/org-github-management/blob/main/config/copilot-models.yaml)._
 
 \* Costi in AI credits per 1M token (input / output), 1 credit = $0,01. Dove indicato, il prezzo cambia oltre una soglia di contesto (es. >272K token).
