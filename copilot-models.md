@@ -8,7 +8,7 @@ Modelli abilitati per l'enterprise AGIC, con costo e quando usarli.
 | **GPT-6 Luna** | **$0,10 / $0,50**<br>$0,20 / $0,75 >272K | Coding quotidiano, modifiche circoscritte, test, documentazione, SQL, piccoli bug e task ripetitivi | **Default economico e veloce** |
 | **Claude Haiku 5.5** | **$0,10 / $0,50**<br>$0,50 / $2,50 >100K | Coding quotidiano, modifiche circoscritte e piccoli task ripetitivi quando si preferisce un'alternativa Anthropic veloce | **Default economico e veloce** |
 | **Claude Sonnet 5.5** | **$2 / $10** | Feature, debugging, refactor, task multi-file e Agent Mode | **Default per il lavoro più strutturato** |
-| **GPT-6 Sol** | **$2 / $10**<br>$4 / $15 >272K | Problemi complessi, debugging difficile, architettura, migrazioni e reasoning elevato | **Escalation per task complessi** |
+| **GPT-6.1 Sol** | **$2 / $10**<br>$4 / $15 >272K | Problemi complessi, debugging difficile, architettura, migrazioni e reasoning elevato | **Escalation per task complessi** |
 | **Claude Opus 5.5** | **$4 / $20** | Task particolarmente difficili, agent di lunga durata, problemi ambigui o già falliti con altri modelli | **Escalation avanzata** |
 | **MAI-Code-1.1-Flash** | **$0,20 / $1,20** | Coding rapido, task chiari e ripetitivi | **Add-on economico** |
 | **Gemini 3.8 Flash** | **$0,75 / $3,75**<br>🏷️ promo fino al 31/12/2026 | Task veloci, prototipazione e trasformazioni semplici | **Add-on orientato alla velocità** |
@@ -16,6 +16,6 @@ Modelli abilitati per l'enterprise AGIC, con costo e quando usarli.
 | **Grok 4.7** | **$2 / $6**<br>$4 / $12 >200K | Workflow agentici e problem solving multi-step | **Add-on / alternativa di provider** |
 | **Kimi K3** | **$3 / $15** | Codebase molto grandi, contesto esteso e workflow agentici lunghi | **Add-on per long context** |
 
-_Aggiornato il 14/10/2026. Fonte: [config/copilot-models.yaml](https://github.com/AgicCompany/org-github-management/blob/main/config/copilot-models.yaml)._
+_Aggiornato il 15/10/2026. Fonte: [config/copilot-models.yaml](https://github.com/AgicCompany/org-github-management/blob/main/config/copilot-models.yaml)._
 
 \* Costi in AI credits per 1M token (input / output), 1 credit = $0,01. Dove indicato, il prezzo cambia oltre una soglia di contesto (es. >272K token).
