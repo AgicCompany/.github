@@ -1,6 +1,6 @@
 # Report di conformita' progetti (org-wide)
 
-_Read-only · agg. 2026-10-12 · 24 progetti analizzati · 16 non conformi · 4 con warning_
+_Read-only · agg. 2026-10-19 · 25 progetti analizzati · 16 non conformi · 4 con warning_
 
 Standard di riferimento: template **#8 agic_scrum** / **#9 agic_kanban**.
 La conformita' "hard" richiede tutti i campi obbligatori e uno Status **standard** o **personalizzato**.
@@ -39,6 +39,7 @@ Verdetto: ✅ conforme · ⚠️ conforme con warning · ❌ non conforme.
 | 30 | chiome-legal_pricing_assistant | kanban | ✅ | standard | — | — | — |
 | 34 | ce-demo/universita_bicocca | scrum | ⚠️ | personalizzato | — | Backlog, Ready, In Review, Blocked | — |
 | 36 | stevanato-myspace3_0 | kanban | ✅ | standard | — | — | — |
+| 39 | iccrom-website | kanban | ✅ | standard | — | — | — |
 
 ## ❌ Non conformi — azione consigliata
 - **#1 @KeyserDSoze's untitled project** — campi mancanti: Priority, Severity, Effort level, 🚨 Alert, Target date; Status di GitHub mai configurato (Todo/In Progress/Done). Ricrearlo da template o allineare campi/Status.
