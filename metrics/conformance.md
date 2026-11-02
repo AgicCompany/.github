@@ -1,6 +1,6 @@
 # Report di conformita' progetti (org-wide)
 
-_Read-only · agg. 2026-10-26 · 28 progetti analizzati · 17 non conformi · 4 con warning_
+_Read-only · agg. 2026-11-02 · 34 progetti analizzati · 17 non conformi · 5 con warning_
 
 Standard di riferimento: template **#8 agic_scrum** / **#9 agic_kanban**.
 La conformita' "hard" richiede tutti i campi obbligatori e uno Status **standard** o **personalizzato**.
@@ -31,7 +31,7 @@ Verdetto: ✅ conforme · ⚠️ conforme con warning · ❌ non conforme.
 | 32 | bricofer-startrade | kanban | ❌ | incompleto | — | Removed | — |
 | 33 | enpav-sirena | kanban | ❌ | incompleto | — | Removed | — |
 | 38 | Internal.bc_workflow | kanban | ❌ | incompleto | — | Removed | — |
-| 42 | @martinabruniagic's untitled project | kanban | ❌ | default | Priority, Severity, Effort level, 🚨 Alert, Target date | Backlog, Ready, In Review, Blocked, Removed | Backlog, Board, Roadmap, Bug tracking, Impediment tracking, Alert attivi |
+| 42 | IP.agic_bob | kanban | ❌ | default | Priority, Severity, Effort level, 🚨 Alert, Target date | Backlog, Ready, In Review, Blocked, Removed | Backlog, Board, Roadmap, Bug tracking, Impediment tracking, Alert attivi |
 | 10 | GitHub Adoption | kanban | ✅ | standard | — | — | — |
 | 13 | Isokinetic Implementation | kanban | ✅ | standard | — | — | — |
 | 21 | ce-demo/esa_germany | scrum | ⚠️ | personalizzato | — | Backlog, Ready, In Review, Blocked | — |
@@ -43,6 +43,12 @@ Verdetto: ✅ conforme · ⚠️ conforme con warning · ❌ non conforme.
 | 39 | iccrom-website | kanban | ✅ | standard | — | — | — |
 | 40 | Internal.fabric-agentic-template | kanban | ✅ | standard | — | — | — |
 | 41 | safety21-contact_center | kanban | ✅ | standard | — | — | — |
+| 43 | bolton-bc_customization | kanban | ✅ | standard | — | — | — |
+| 44 | Internal.fabric-agentic-cicd-plugin | kanban | ✅ | standard | — | — | — |
+| 45 | novomatic-bc_customization | kanban | ✅ | standard | — | — | — |
+| 46 | chiome-legal_pricing_assistant-fabric | kanban | ✅ | standard | — | — | — |
+| 47 | IP.presale_agent | scrum | ⚠️ | personalizzato | — | Backlog, Ready, In Review, Blocked | — |
+| 48 | oberalp-bc_customization | kanban | ✅ | standard | — | — | — |
 
 ## ❌ Non conformi — azione consigliata
 - **#1 @KeyserDSoze's untitled project** — campi mancanti: Priority, Severity, Effort level, 🚨 Alert, Target date; Status di GitHub mai configurato (Todo/In Progress/Done). Ricrearlo da template o allineare campi/Status.
@@ -61,10 +67,11 @@ Verdetto: ✅ conforme · ⚠️ conforme con warning · ❌ non conforme.
 - **#32 bricofer-startrade** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
 - **#33 enpav-sirena** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
 - **#38 Internal.bc_workflow** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
-- **#42 @martinabruniagic's untitled project** — campi mancanti: Priority, Severity, Effort level, 🚨 Alert, Target date; Status di GitHub mai configurato (Todo/In Progress/Done). Ricrearlo da template o allineare campi/Status.
+- **#42 IP.agic_bob** — campi mancanti: Priority, Severity, Effort level, 🚨 Alert, Target date; Status di GitHub mai configurato (Todo/In Progress/Done). Ricrearlo da template o allineare campi/Status.
 
 ## ⚠️ Conformi con warning
 - **#21 ce-demo/esa_germany** — Status personalizzato (workflow cliente).
 - **#26 ucan-servizi_al_cittadino** — Status personalizzato (workflow cliente).
 - **#28 ce-demo/acquedotto_lucano** — Status personalizzato (workflow cliente).
 - **#34 ce-demo/universita_bicocca** — Status personalizzato (workflow cliente).
+- **#47 IP.presale_agent** — Status personalizzato (workflow cliente).

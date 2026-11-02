@@ -1,29 +1,35 @@
 snapshot_date,project_number,project_title,method,conformant,status_kind,missing_fields,missing_status_options,extra_status_options,missing_views
-2026-10-26,1,@KeyserDSoze's untitled project,kanban,no,default,Priority|Severity|Effort level|🚨 Alert|Target date,Backlog|Ready|In Review|Blocked|Removed,Todo,Backlog|Board|Roadmap|Bug tracking|Impediment tracking|Alert attivi
-2026-10-26,4,@lorenzotestiagic's untitled project,kanban,no,default,Priority|Severity|Effort level|🚨 Alert|Target date,Backlog|Ready|In Review|Blocked|Removed,Todo,Backlog|Board|Roadmap|Bug tracking|Impediment tracking|Alert attivi
-2026-10-26,5,@marziamariottoagic_testScrum,kanban,no,default,Severity|Effort level|🚨 Alert|Target date,Backlog|Ready|In Review|Blocked|Removed,Todo,Backlog|Board|Roadmap|Bug tracking|Impediment tracking|Alert attivi
-2026-10-26,15,@giuseppemontanaroagic's untitled project,kanban,no,default,Priority|Severity|Effort level|🚨 Alert|Target date,Backlog|Ready|In Review|Blocked|Removed,Todo,Backlog|Board|Roadmap|Bug tracking|Impediment tracking|Alert attivi
-2026-10-26,17,@danieleincalzaagic's untitled project,kanban,no,default,Priority|Severity|Effort level|🚨 Alert|Target date,Backlog|Ready|In Review|Blocked|Removed,Todo,Backlog|Board|Roadmap|Bug tracking|Impediment tracking|Alert attivi
-2026-10-26,18,isok-bcproject,kanban,no,incompleto,,Removed,,
-2026-10-26,19,ferroli/hydra,kanban,no,default,Target date,Backlog|Ready|In Review|Blocked|Removed,Todo,Backlog|Board|Roadmap|Bug tracking|Impediment tracking|Alert attivi
-2026-10-26,20,ucan/servizi_al_cittadino,scrum,no,default,Target date,Backlog|Ready|In Review|Blocked|Removed,Todo,Backlog|Sprint backlog|Sprint board|Sprint breakdown|Roadmap|Bug tracking|Impediment tracking|Alert attivi
-2026-10-26,23,alperia-lava,kanban,no,incompleto,,Removed,,
-2026-10-26,24,ferroli-hydra,kanban,no,incompleto,,Removed,,
-2026-10-26,25,isoki-bc_customization,kanban,no,incompleto,,Removed,,
-2026-10-26,29,Agic-chiomenti-github,kanban,no,incompleto,,Removed,,
-2026-10-26,31,dedagroup-agent_data_platform,kanban,no,incompleto,,Removed,,
-2026-10-26,32,bricofer-startrade,kanban,no,incompleto,,Removed,,
-2026-10-26,33,enpav-sirena,kanban,no,incompleto,,Removed,,
-2026-10-26,38,Internal.bc_workflow,kanban,no,incompleto,,Removed,,
-2026-10-26,42,@martinabruniagic's untitled project,kanban,no,default,Priority|Severity|Effort level|🚨 Alert|Target date,Backlog|Ready|In Review|Blocked|Removed,Todo,Backlog|Board|Roadmap|Bug tracking|Impediment tracking|Alert attivi
-2026-10-26,10,GitHub Adoption,kanban,yes,standard,,,,
-2026-10-26,13,Isokinetic Implementation,kanban,yes,standard,,,,
-2026-10-26,21,ce-demo/esa_germany,scrum,yes,personalizzato,,Backlog|Ready|In Review|Blocked,New|In analysis|Ready to work|Approved|To Do|Ready for qa|Validated by QA,
-2026-10-26,26,ucan-servizi_al_cittadino,scrum,yes,personalizzato,,Backlog|Ready|In Review|Blocked,New|In analysis|Ready to work|Approved|To Do|Ready for qa|Validated by QA,
-2026-10-26,28,ce-demo/acquedotto_lucano,scrum,yes,personalizzato,,Backlog|Ready|In Review|Blocked,New|In analysis|Ready to work|Approved|To Do|Ready for qa|Validated by QA,
-2026-10-26,30,chiome-legal_pricing_assistant,kanban,yes,standard,,,,
-2026-10-26,34,ce-demo/universita_bicocca,scrum,yes,personalizzato,,Backlog|Ready|In Review|Blocked,New|In analysis|Ready to work|Approved|To Do|Ready for qa|Validated by QA,
-2026-10-26,36,stevanato-myspace3_0,kanban,yes,standard,,,,
-2026-10-26,39,iccrom-website,kanban,yes,standard,,,,
-2026-10-26,40,Internal.fabric-agentic-template,kanban,yes,standard,,,,
-2026-10-26,41,safety21-contact_center,kanban,yes,standard,,,,
+2026-11-02,1,@KeyserDSoze's untitled project,kanban,no,default,Priority|Severity|Effort level|🚨 Alert|Target date,Backlog|Ready|In Review|Blocked|Removed,Todo,Backlog|Board|Roadmap|Bug tracking|Impediment tracking|Alert attivi
+2026-11-02,4,@lorenzotestiagic's untitled project,kanban,no,default,Priority|Severity|Effort level|🚨 Alert|Target date,Backlog|Ready|In Review|Blocked|Removed,Todo,Backlog|Board|Roadmap|Bug tracking|Impediment tracking|Alert attivi
+2026-11-02,5,@marziamariottoagic_testScrum,kanban,no,default,Severity|Effort level|🚨 Alert|Target date,Backlog|Ready|In Review|Blocked|Removed,Todo,Backlog|Board|Roadmap|Bug tracking|Impediment tracking|Alert attivi
+2026-11-02,15,@giuseppemontanaroagic's untitled project,kanban,no,default,Priority|Severity|Effort level|🚨 Alert|Target date,Backlog|Ready|In Review|Blocked|Removed,Todo,Backlog|Board|Roadmap|Bug tracking|Impediment tracking|Alert attivi
+2026-11-02,17,@danieleincalzaagic's untitled project,kanban,no,default,Priority|Severity|Effort level|🚨 Alert|Target date,Backlog|Ready|In Review|Blocked|Removed,Todo,Backlog|Board|Roadmap|Bug tracking|Impediment tracking|Alert attivi
+2026-11-02,18,isok-bcproject,kanban,no,incompleto,,Removed,,
+2026-11-02,19,ferroli/hydra,kanban,no,default,Target date,Backlog|Ready|In Review|Blocked|Removed,Todo,Backlog|Board|Roadmap|Bug tracking|Impediment tracking|Alert attivi
+2026-11-02,20,ucan/servizi_al_cittadino,scrum,no,default,Target date,Backlog|Ready|In Review|Blocked|Removed,Todo,Backlog|Sprint backlog|Sprint board|Sprint breakdown|Roadmap|Bug tracking|Impediment tracking|Alert attivi
+2026-11-02,23,alperia-lava,kanban,no,incompleto,,Removed,,
+2026-11-02,24,ferroli-hydra,kanban,no,incompleto,,Removed,,
+2026-11-02,25,isoki-bc_customization,kanban,no,incompleto,,Removed,,
+2026-11-02,29,Agic-chiomenti-github,kanban,no,incompleto,,Removed,,
+2026-11-02,31,dedagroup-agent_data_platform,kanban,no,incompleto,,Removed,,
+2026-11-02,32,bricofer-startrade,kanban,no,incompleto,,Removed,,
+2026-11-02,33,enpav-sirena,kanban,no,incompleto,,Removed,,
+2026-11-02,38,Internal.bc_workflow,kanban,no,incompleto,,Removed,,
+2026-11-02,42,IP.agic_bob,kanban,no,default,Priority|Severity|Effort level|🚨 Alert|Target date,Backlog|Ready|In Review|Blocked|Removed,Todo,Backlog|Board|Roadmap|Bug tracking|Impediment tracking|Alert attivi
+2026-11-02,10,GitHub Adoption,kanban,yes,standard,,,,
+2026-11-02,13,Isokinetic Implementation,kanban,yes,standard,,,,
+2026-11-02,21,ce-demo/esa_germany,scrum,yes,personalizzato,,Backlog|Ready|In Review|Blocked,New|In analysis|Ready to work|Approved|To Do|Ready for qa|Validated by QA,
+2026-11-02,26,ucan-servizi_al_cittadino,scrum,yes,personalizzato,,Backlog|Ready|In Review|Blocked,New|In analysis|Ready to work|Approved|To Do|Ready for qa|Validated by QA,
+2026-11-02,28,ce-demo/acquedotto_lucano,scrum,yes,personalizzato,,Backlog|Ready|In Review|Blocked,New|In analysis|Ready to work|Approved|To Do|Ready for qa|Validated by QA,
+2026-11-02,30,chiome-legal_pricing_assistant,kanban,yes,standard,,,,
+2026-11-02,34,ce-demo/universita_bicocca,scrum,yes,personalizzato,,Backlog|Ready|In Review|Blocked,New|In analysis|Ready to work|Approved|To Do|Ready for qa|Validated by QA,
+2026-11-02,36,stevanato-myspace3_0,kanban,yes,standard,,,,
+2026-11-02,39,iccrom-website,kanban,yes,standard,,,,
+2026-11-02,40,Internal.fabric-agentic-template,kanban,yes,standard,,,,
+2026-11-02,41,safety21-contact_center,kanban,yes,standard,,,,
+2026-11-02,43,bolton-bc_customization,kanban,yes,standard,,,,
+2026-11-02,44,Internal.fabric-agentic-cicd-plugin,kanban,yes,standard,,,,
+2026-11-02,45,novomatic-bc_customization,kanban,yes,standard,,,,
+2026-11-02,46,chiome-legal_pricing_assistant-fabric,kanban,yes,standard,,,,
+2026-11-02,47,IP.presale_agent,scrum,yes,personalizzato,,Backlog|Ready|In Review|Blocked,New|In analysis|Ready to work|Approved|To Do|Ready for qa|Validated by QA,
+2026-11-02,48,oberalp-bc_customization,kanban,yes,standard,,,,
