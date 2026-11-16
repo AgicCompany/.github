@@ -1,6 +1,6 @@
 # Report di conformita' progetti (org-wide)
 
-_Read-only · agg. 2026-11-09 · 36 progetti analizzati · 17 non conformi · 5 con warning_
+_Read-only · agg. 2026-11-16 · 37 progetti analizzati · 18 non conformi · 5 con warning_
 
 Standard di riferimento: template **#8 agic_scrum** / **#9 agic_kanban**.
 La conformita' "hard" richiede tutti i campi obbligatori e uno Status **standard** o **personalizzato**.
@@ -32,6 +32,7 @@ Verdetto: ✅ conforme · ⚠️ conforme con warning · ❌ non conforme.
 | 33 | enpav-sirena | kanban | ❌ | incompleto | — | Removed | — |
 | 38 | Internal.bc_workflow | kanban | ❌ | incompleto | — | Removed | — |
 | 42 | IP.agic_bob | kanban | ❌ | default | Priority, Severity, Effort level, 🚨 Alert, Target date | Backlog, Ready, In Review, Blocked, Removed | Backlog, Board, Roadmap, Bug tracking, Impediment tracking, Alert attivi |
+| 51 | @darlingselitaagic's untitled project | kanban | ❌ | default | Priority, Severity, Effort level, 🚨 Alert, Target date | Backlog, Ready, In Review, Blocked, Removed | Backlog, Board, Roadmap, Bug tracking, Impediment tracking, Alert attivi |
 | 10 | GitHub Adoption | kanban | ✅ | standard | — | — | — |
 | 13 | Isokinetic Implementation | kanban | ✅ | standard | — | — | — |
 | 21 | ce-demo/esa_germany | scrum | ⚠️ | personalizzato | — | Backlog, Ready, In Review, Blocked | — |
@@ -70,6 +71,7 @@ Verdetto: ✅ conforme · ⚠️ conforme con warning · ❌ non conforme.
 - **#33 enpav-sirena** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
 - **#38 Internal.bc_workflow** — opzioni Status mancanti: Removed. Ricrearlo da template o allineare campi/Status.
 - **#42 IP.agic_bob** — campi mancanti: Priority, Severity, Effort level, 🚨 Alert, Target date; Status di GitHub mai configurato (Todo/In Progress/Done). Ricrearlo da template o allineare campi/Status.
+- **#51 @darlingselitaagic's untitled project** — campi mancanti: Priority, Severity, Effort level, 🚨 Alert, Target date; Status di GitHub mai configurato (Todo/In Progress/Done). Ricrearlo da template o allineare campi/Status.
 
 ## ⚠️ Conformi con warning
 - **#21 ce-demo/esa_germany** — Status personalizzato (workflow cliente).
