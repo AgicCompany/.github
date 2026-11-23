@@ -15,8 +15,8 @@ Modelli abilitati per l'enterprise AGIC, con costo e quando usarli.
 | **Gemini 4 Hydrogen** | **$1,50 / $7,50** | Feature quotidiane, prototipazione e task multi-file quando si preferisce un'opzione Google più leggera di Gemini 4 Carbon | **Add-on Google versatile** |
 | **Gemini 4 Carbon** | **$2 / $10**<br>🏷️ promo fino al 01/12/2026 | Reasoning complesso e task multi-step in cui un modello Google è più adatto del default<br>⚠️ Il prezzo promozionale termina il 2026-12-01 e il prezzo post-promo non è pubblicato; rivalutare quando lo sarà | **Add-on Google potente** |
 | **Grok 4.7** | **$2 / $6**<br>$4 / $12 >200K | Workflow agentici e problem solving multi-step | **Add-on / alternativa di provider** |
-| **Kimi K3** | **$3 / $15** | Codebase molto grandi, contesto esteso e workflow agentici lunghi<br>⚠️ Dismesso il 2026-12-14; non iniziare nuovo lavoro su di esso | **Add-on long context** |
+| **Kimi K3** | **$3 / $15** | Codebase molto grandi, contesto esteso e workflow agentici lunghi | **Add-on long context**<br>⏳ in dismissione: disattivato dal 14/12/2026, non usarlo per nuovi lavori → usa Auto |
 
-_Aggiornato il 18/11/2026. Fonte: [config/copilot-models.yaml](https://github.com/AgicCompany/org-github-management/blob/main/config/copilot-models.yaml)._
+_Aggiornato il 23/11/2026. Fonte: [config/copilot-models.yaml](https://github.com/AgicCompany/org-github-management/blob/main/config/copilot-models.yaml)._
 
 \* Costi in AI credits per 1M token (input / output), 1 credit = $0,01. Dove indicato, il prezzo cambia oltre una soglia di contesto (es. >272K token).
