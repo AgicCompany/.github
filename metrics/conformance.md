@@ -1,6 +1,6 @@
 # Report di conformita' progetti (org-wide)
 
-_Read-only · agg. 2026-11-16 · 37 progetti analizzati · 18 non conformi · 5 con warning_
+_Read-only · agg. 2026-11-23 · 40 progetti analizzati · 18 non conformi · 8 con warning_
 
 Standard di riferimento: template **#8 agic_scrum** / **#9 agic_kanban**.
 La conformita' "hard" richiede tutti i campi obbligatori e uno Status **standard** o **personalizzato**.
@@ -52,6 +52,9 @@ Verdetto: ✅ conforme · ⚠️ conforme con warning · ❌ non conforme.
 | 48 | oberalp-bc_customization | kanban | ✅ | standard | — | — | — |
 | 49 | Internal.delivery_manager | kanban | ✅ | standard | — | — | — |
 | 50 | Internal.edge_lens | kanban | ✅ | standard | — | — | — |
+| 52 | IP.timevision | scrum | ⚠️ | personalizzato | — | Backlog, Ready, In Review, Blocked | — |
+| 55 | faac-demo_field_service | scrum | ⚠️ | personalizzato | — | Backlog, Ready, In Review, Blocked | — |
+| 56 | ce-demo/gruppo_ristorfoods | scrum | ⚠️ | personalizzato | — | Backlog, Ready, In Review, Blocked | — |
 
 ## ❌ Non conformi — azione consigliata
 - **#1 @KeyserDSoze's untitled project** — campi mancanti: Priority, Severity, Effort level, 🚨 Alert, Target date; Status di GitHub mai configurato (Todo/In Progress/Done). Ricrearlo da template o allineare campi/Status.
@@ -79,3 +82,6 @@ Verdetto: ✅ conforme · ⚠️ conforme con warning · ❌ non conforme.
 - **#28 ce-demo/acquedotto_lucano** — Status personalizzato (workflow cliente).
 - **#34 ce-demo/universita_bicocca** — Status personalizzato (workflow cliente).
 - **#47 IP.presale_agent** — Status personalizzato (workflow cliente).
+- **#52 IP.timevision** — Status personalizzato (workflow cliente).
+- **#55 faac-demo_field_service** — Status personalizzato (workflow cliente).
+- **#56 ce-demo/gruppo_ristorfoods** — Status personalizzato (workflow cliente).
