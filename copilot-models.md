@@ -18,6 +18,14 @@ Modelli abilitati per l'enterprise AGIC, con costo e quando usarli.
 | **Gemini 4 Neon** | **$3 / $15** | Lavoro di produzione veloce e ad alte capacità, refactor multi-file, analisi di documenti complessi e workflow agentici quando si preferisce un'opzione Google | **Add-on Google premium e versatile** |
 | **Kimi K3** | **$3 / $15** | Codebase molto grandi, contesto esteso e workflow agentici lunghi | **Add-on long context**<br>⏳ in dismissione: disattivato dal 14/12/2026, non usarlo per nuovi lavori → usa Auto |
 
+## Modelli riservati a team specifici
+
+Modelli abilitati solo per specifici team (tramite team enterprise `ent:<slug>`).
+
+| Modello | Team autorizzati | Costo input / output\* | Quando usarlo | Ruolo |
+| --- | --- | --- | --- | --- |
+| **Claude Fable 5.2** | `copilot-frontier` | **$8 / $40** | Valutazione delle capacità frontier sui task più difficili di reasoning, architettura e agentici prima di qualsiasi rollout più ampio; non per il lavoro di routine | **Escalation frontier (solo governance)** |
+
 _Aggiornato il 24/11/2026. Fonte: [config/copilot-models.yaml](https://github.com/AgicCompany/org-github-management/blob/main/config/copilot-models.yaml)._
 
 \* Costi in AI credits per 1M token (input / output), 1 credit = $0,01. Dove indicato, il prezzo cambia oltre una soglia di contesto (es. >272K token).
