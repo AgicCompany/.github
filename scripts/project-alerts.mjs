@@ -12,7 +12,7 @@
  *   aggiungi --dry-run per simulare senza scrivere
  *
  * Variabili d'ambiente richieste:
- *   GITHUB_TOKEN     PAT classico con scope "project" (e "read:org" se org). In Actions usare un secret.
+ *   GITHUB_TOKEN     PAT classico con scope "project" + "repo" (e "read:org" se org). In Actions usare un secret.
  *   PROJECT_OWNER    login dell'owner (es. "AgicCompany") - sempre richiesto
  *   PROJECT_NUMBER   numero del project - richiesto solo per "setup" e "run"
  *   OWNER_TYPE       "organization" (default) oppure "user"

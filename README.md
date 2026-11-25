@@ -133,8 +133,10 @@ Questo evita duplicazioni tra form e campi strutturati (utili per filtri e viste
 - I **tipi di issue** (Epic, Feature, ecc.) sono definiti a livello di organizzazione in
   *Settings → Issue Types*; i template qui presenti li **pre-selezionano** ma non li creano.
 - Le **automazioni** (`scripts/` + `.github/workflows/`) richiedono il secret **`PROJECTS_TOKEN`**
-  a livello di repo: un PAT con scope `project` + `read:org` usato per leggere/scrivere i Project
-  dell'org via API. Senza questo secret i workflow schedulati falliscono.
+  a livello di repo: un PAT classico con scope `project` + `read:org` + `repo`, usato per leggere/scrivere
+  i Project dell'org via API. Lo scope `repo` serve a leggere le issue delle repo private (stato nativo,
+  stato chiuso, label, tipo, assegnatari, stima): senza, gli item risultano vuoti e le regole lavorano
+  su dati mancanti. Senza questo secret i workflow schedulati falliscono.
 
 ---
 

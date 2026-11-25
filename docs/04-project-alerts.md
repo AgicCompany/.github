@@ -79,12 +79,18 @@ semplicemente ignorata su quel progetto, senza errori.
 
 ## Credenziali
 
-Il workflow usa il secret **`PROJECTS_TOKEN`**: un **PAT classico** con scope `project` + `read:org`.
+Il workflow usa il secret **`PROJECTS_TOKEN`**: un **PAT classico** con scope `project` + `read:org` + `repo`.
+
+> Lo scope `repo` serve a leggere il contenuto delle issue nelle repo **private** (status nativo, stato
+> chiuso, label, tipo, assegnatari, stima). Senza, l'API restituisce gli item senza contenuto: le
+> regole lavorano su dati mancanti (es. "Non pronto per sprint" su item stimati e assegnati).
+> `repo` da accesso in scrittura a tutte le repo dell'owner del token: usare un account di servizio
+> con i soli permessi necessari, oppure una GitHub App (evoluzione consigliata).
 
 | Domanda | Risposta |
 |---------|----------|
 | Perche non il `GITHUB_TOKEN` di default? | Non puo scrivere i Project a livello di organizzazione. |
-| Perche un PAT dedicato e non un token admin personale? | Privilegio minimo: solo `project`, evita di esporre scope `admin:org` in un repo condiviso. |
+| Perche un PAT dedicato e non un token admin personale? | Privilegio minimo: solo `project`, `read:org` e `repo` (lettura delle issue private), evita di esporre scope `admin:org` in un repo condiviso. |
 | Perche non una GitHub App? | Sarebbe l'opzione piu robusta (identita macchina), ma richiede setup aggiuntivo; scartata per semplicita. Resta l'evoluzione consigliata. |
 
 Variabili del repo: `PROJECT_OWNER` (= `AgicCompany`), `OWNER_TYPE` (= `organization`).

@@ -124,7 +124,8 @@ ereditate dai progetti creati dal template). Per una velocity chart:
 
 ## Credenziali e configurazione
 
-- Usano il secret **`PROJECTS_TOKEN`** (PAT con scope `project` + `read:org`) e le variabili
+- Usano il secret **`PROJECTS_TOKEN`** (PAT classico con scope `project` + `read:org` + `repo`; `repo`
+  serve a leggere le issue delle repo private, vedi [guida 04](04-project-alerts.md#credenziali)) e le variabili
   `PROJECT_OWNER` / `OWNER_TYPE`, come gli Alert.
 - Nomi dei campi e tipi nel modulo `scripts/lib/projects.mjs` (oggetto `CONFIG`); logica degli stati
   (status nativo, vecchi nomi, label `blocked`) nel modulo `scripts/lib/status.mjs`.
