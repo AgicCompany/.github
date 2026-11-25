@@ -43,6 +43,8 @@ export function fail(msg) {
 if (!TOKEN) fail('Manca GITHUB_TOKEN/PROJECTS_TOKEN (PAT con scope "project").');
 if (!OWNER) fail('Manca PROJECT_OWNER.');
 
+// Nessun retry qui: alcune mutation degli script schedulati (es. status update del digest) non sono
+// idempotenti. Gli errori HTTP e le risposte non JSON (es. 502 HTML) diventano messaggi chiari.
 export async function gql(query, variables = {}) {
   const res = await fetch('https://api.github.com/graphql', {
     method: 'POST',
@@ -53,7 +55,10 @@ export async function gql(query, variables = {}) {
     },
     body: JSON.stringify({ query, variables }),
   });
-  const json = await res.json();
+  const text = await res.text();
+  let json;
+  try { json = JSON.parse(text); } catch { throw new Error(`HTTP ${res.status}: risposta non JSON dall'API GitHub`); }
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${json.message || text.slice(0, 200)}`);
   if (json.errors) throw new Error('GraphQL: ' + JSON.stringify(json.errors, null, 2));
   return json.data;
 }
