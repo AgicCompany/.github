@@ -24,7 +24,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { gql, fail, OWNER } from './lib/projects.mjs';
 import {
-  NATIVE_STATUSES, BLOCKED_LABEL, nativeFromLegacy, isNativeName, categoryOfName, isClosedCategory,
+  NATIVE_STATUSES, BLOCKED_LABEL, nativeFromLegacy, isNativeName, isNativeMirror, categoryOfName, isClosedCategory,
 } from './lib/status.mjs';
 
 const args = process.argv.slice(2);
@@ -49,7 +49,7 @@ async function loadProject() {
   let cursor = null, project = null;
   const items = [];
   do {
-    const p = (await gql(ITEM_Q, { o: OWNER, n: PROJECT, c: cursor })).organization.projectV2;
+    const p = (await gqlRetry(ITEM_Q, { o: OWNER, n: PROJECT, c: cursor })).organization.projectV2;
     if (!p) fail(`Progetto #${PROJECT} non trovato in ${OWNER}`);
     if (!p.field) fail(`Il progetto #${PROJECT} non ha un campo Status single-select`);
     project = p;
@@ -61,7 +61,7 @@ async function loadProject() {
 
 async function nativeIds(repoOwnerName) {
   const [owner, name] = repoOwnerName.split('/');
-  const d = await gql(`query($o:String!,$r:String!){ repository(owner:$o,name:$r){ planningStatuses(first:20){ nodes{ id name } } } }`, { o: owner, r: name });
+  const d = await gqlRetry(`query($o:String!,$r:String!){ repository(owner:$o,name:$r){ planningStatuses(first:20){ nodes{ id name } } } }`, { o: owner, r: name });
   const map = {};
   for (const s of d.repository?.planningStatuses?.nodes || []) map[s.name.toLowerCase()] = s.id;
   for (const s of NATIVE_STATUSES) if (!map[s.toLowerCase()]) fail(`Status nativo "${s}" non disponibile in ${repoOwnerName}`);
@@ -125,20 +125,55 @@ function report(project, plans, optionPlan, drafts) {
   if (dropped.length) console.log(`  opzioni rimosse: ${dropped.map(o => o.name).join(', ')} (i valori vengono riassegnati in fase 3)`);
 }
 
-async function ensureLabel(repo) {
-  const [owner, name] = repo.split('/');
-  const d = await gql(`query($o:String!,$r:String!,$l:String!){ repository(owner:$o,name:$r){ id label(name:$l){ id } } }`, { o: owner, r: name, l: BLOCKED_LABEL });
-  if (d.repository.label) return d.repository.label.id;
-  const m = await gql(`mutation($r:ID!,$n:String!){ createLabel(input:{repositoryId:$r,name:$n,color:"b60205",description:"Item bloccato da un ostacolo"}){ label{ id } } }`,
-    { r: d.repository.id, n: BLOCKED_LABEL });
-  return m.createLabel.label.id;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// Ritenta solo errori transitori (rete, 5xx, HTML, limiti di frequenza). Da usare solo per letture e
+// mutation idempotenti (stesso risultato se ripetute): setIssueStatus, addLabels, valore di un campo.
+async function gqlRetry(query, vars) {
+  for (let attempt = 1; ; attempt++) {
+    try { return await gql(query, vars); } catch (e) {
+      const msg = String(e.message || e);
+      const limited = /rate limit|RATE_LIMITED|HTTP 429/i.test(msg);
+      if (attempt > 3 || !(limited || /HTTP 5\d\d|non JSON|fetch failed|ECONNRESET|ETIMEDOUT|Something went wrong/i.test(msg))) throw e;
+      await sleep(limited ? 60000 : 2000 * 2 ** attempt);
+    }
+  }
 }
 
-// Esegue fn su ogni elemento; un errore su un item non ferma gli altri: viene raccolto in failures.
+async function findLabel(owner, name) {
+  const d = await gqlRetry(`query($o:String!,$r:String!,$l:String!){ repository(owner:$o,name:$r){ id label(name:$l){ id } } }`, { o: owner, r: name, l: BLOCKED_LABEL });
+  return { repoId: d.repository.id, labelId: d.repository.label?.id ?? null };
+}
+
+// createLabel non e' idempotente: niente retry cieco, in caso di errore si verifica se la label esiste gia.
+async function ensureLabel(repo) {
+  const [owner, name] = repo.split('/');
+  const found = await findLabel(owner, name);
+  if (found.labelId) return found.labelId;
+  try {
+    const m = await gql(`mutation($r:ID!,$n:String!){ createLabel(input:{repositoryId:$r,name:$n,color:"b60205",description:"Item bloccato da un ostacolo"}){ label{ id } } }`,
+      { r: found.repoId, n: BLOCKED_LABEL });
+    return m.createLabel.label.id;
+  } catch (e) {
+    await sleep(5000);
+    const again = await findLabel(owner, name);
+    if (again.labelId) return again.labelId;
+    throw e;
+  }
+}
+
+// Esegue fn su ogni elemento. Un errore su un item non ferma gli altri: viene raccolto in failures.
 async function eachSafe(list, failures, label, fn) {
   for (const x of list) {
     try { await fn(x); } catch (e) { failures.push(`${label(x)}: ${e.message || e}`); }
   }
+}
+
+// Pausa di 1 s dopo ogni scrittura (raccomandazione GitHub per le mutation in serie).
+async function write(query, vars) {
+  const d = await gqlRetry(query, vars);
+  await sleep(1000);
+  return d;
 }
 
 async function applyNative(plans, failures) {
@@ -148,21 +183,28 @@ async function applyNative(plans, failures) {
     if (p.plan.action === 'set') {
       idsByRepo[repo] ||= await nativeIds(repo);
       const vars = { i: p.item.content.id, s: idsByRepo[repo][p.plan.target.toLowerCase()], d: p.item.content.duplicateOf?.id ?? null };
-      await gql(`mutation($i:ID!,$s:ID!,$d:ID){ setIssueStatus(input:{issueId:$i,statusId:$s,duplicateIssueId:$d}){ clientMutationId } }`, vars);
+      await write(`mutation($i:ID!,$s:ID!,$d:ID){ setIssueStatus(input:{issueId:$i,statusId:$s,duplicateIssueId:$d}){ clientMutationId } }`, vars);
     }
     if (p.addBlocked) {
       labelByRepo[repo] ||= await ensureLabel(repo);
-      await gql(`mutation($i:ID!,$l:[ID!]!){ addLabelsToLabelable(input:{labelableId:$i,labelIds:$l}){ clientMutationId } }`,
+      await write(`mutation($i:ID!,$l:[ID!]!){ addLabelsToLabelable(input:{labelableId:$i,labelIds:$l}){ clientMutationId } }`,
         { i: p.item.content.id, l: [labelByRepo[repo]] });
     }
   });
 }
 
+// updateProjectV2Field sostituisce l'elenco delle opzioni: ripeterla alla cieca potrebbe duplicare le
+// opzioni nuove. In caso di errore si rilegge il campo: se e' gia lo specchio nativo, va bene cosi.
 async function applyOptions(field, optionPlan) {
   const opts = optionPlan.map(o => ({ ...(o.id ? { id: o.id } : {}), name: o.name, color: o.color, description: o.description }));
-  const d = await gql(`mutation($f:ID!,$o:[ProjectV2SingleSelectFieldOptionInput!]){ updateProjectV2Field(input:{fieldId:$f,singleSelectOptions:$o}){
-    projectV2Field{ ... on ProjectV2SingleSelectField{ options{ id name } } } } }`, { f: field.id, o: opts });
-  return d.updateProjectV2Field.projectV2Field.options;
+  try {
+    await gql(`mutation($f:ID!,$o:[ProjectV2SingleSelectFieldOptionInput!]){ updateProjectV2Field(input:{fieldId:$f,singleSelectOptions:$o}){
+      projectV2Field{ ... on ProjectV2SingleSelectField{ id } } } }`, { f: field.id, o: opts });
+  } catch (e) {
+    await sleep(10000);
+    const fresh = await loadProject();
+    if (!isNativeMirror(fresh.field.options.map(o => o.name))) throw e;
+  }
 }
 
 // Riallinea il board: issue -> status nativo attuale; draft -> nome nativo del vecchio valore.
@@ -175,7 +217,7 @@ async function alignBoard(project, oldValues, skippedItemIds, failures) {
   })).filter(({ it, want }) => !skippedItemIds.has(it.id) && want
     && (it.fieldValueByName?.name || '').toLowerCase() !== want.toLowerCase());
   await eachSafe(todo, failures, x => x.it.content?.number ? `#${x.it.content.number}` : `item ${x.it.id}`, ({ it, want }) =>
-    gql(`mutation($p:ID!,$i:ID!,$f:ID!,$o:String!){ updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$i,fieldId:$f,value:{singleSelectOptionId:$o}}){ clientMutationId } }`,
+    write(`mutation($p:ID!,$i:ID!,$f:ID!,$o:String!){ updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$i,fieldId:$f,value:{singleSelectOptionId:$o}}){ clientMutationId } }`,
       { p: project.id, i: it.id, f: fresh.field.id, o: optionByName[want.toLowerCase()] }));
   return todo.length;
 }
@@ -221,7 +263,13 @@ function blockersFor(plans, optionPlan) {
   console.log(`\nSnapshot salvato: ${file} (conservarlo: serve per il ripristino)`);
 
   const failures = [];
-  await applyNative(plans, failures);
+  await applyNative(plans.filter(p => p.plan.action === 'set' || p.addBlocked), failures);
+  if (failures.length) {
+    console.log(`\nSTOP dopo la fase 1: errori su ${failures.length} issue. Il board non e' stato modificato.\n  ${failures.join('\n  ')}`);
+    console.log('Rilanciare lo script: le issue gia aggiornate risultano invariate.');
+    process.exitCode = 1;
+    return;
+  }
   console.log('Fase 1 completata: status nativo e label.');
   if (!alreadyNative) await applyOptions(project.field, optionPlan);
   console.log('Fase 2 completata: opzioni del campo Status.');
