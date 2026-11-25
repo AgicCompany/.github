@@ -103,8 +103,8 @@ ereditate dai progetti creati dal template). Per una velocity chart:
   2. imposta lo **status nativo** di ogni issue dal valore del board (corrispondenza nella
      [guida 03](03-viste-e-filtri.md#stati-status-nativo-delle-issue)); issue aperte senza valore →
      Backlog; issue **chiuse** → sempre lo stato coerente col motivo di chiusura; `Blocked` → label `blocked`;
-  3. sostituisce le opzioni del campo Status con i 7 nomi nativi, **riusando gli ID** delle opzioni
-     esistenti (i valori sugli item restano);
+  3. sostituisce le opzioni del campo Status con i 7 nomi nativi e i colori standard, **riusando gli ID**
+     delle opzioni esistenti (i valori sugli item restano); su un progetto gia migrato aggiorna solo i colori;
   4. riallinea il campo Status del board allo status nativo (draft: nome nativo del vecchio valore).
 - **Regole di sicurezza**: non riapre mai un'issue chiusa e non ne cambia il motivo di chiusura;
   chiude un'issue aperta (board `Done` o `Removed`) solo con `--allow-close`; salta e segnala le issue
