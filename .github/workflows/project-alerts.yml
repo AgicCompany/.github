@@ -32,7 +32,7 @@ jobs:
 
       - name: Run project alerts
         env:
-          # PAT classico con scope "project" + "read:org". NON usare GITHUB_TOKEN: non puo' scrivere i project org.
+          # Fine-grained PAT: Issues read-only (lettura issue private) + Projects read/write. NON usare GITHUB_TOKEN: non puo' scrivere i project org.
           GITHUB_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
           PROJECT_OWNER: ${{ vars.PROJECT_OWNER || 'AgicCompany' }}
           PROJECT_NUMBER: ${{ github.event.inputs.project_number }}
