@@ -134,7 +134,7 @@ async function gqlRetry(query, vars) {
     try { return await gql(query, vars); } catch (e) {
       const msg = String(e.message || e);
       const limited = /rate limit|RATE_LIMITED|HTTP 429/i.test(msg);
-      if (attempt > 3 || !(limited || /HTTP 5\d\d|non JSON|fetch failed|ECONNRESET|ETIMEDOUT/i.test(msg))) throw e;
+      if (attempt > 3 || !(limited || /HTTP 5\d\d|non JSON|fetch failed|ECONNRESET|ETIMEDOUT|Something went wrong/i.test(msg))) throw e;
       await sleep(limited ? 60000 : 2000 * 2 ** attempt);
     }
   }
