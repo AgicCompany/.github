@@ -25,7 +25,8 @@ Modelli abilitati solo per specifici team (tramite team enterprise `ent:<slug>`)
 | Modello | Team autorizzati | Costo input / output\* | Quando usarlo | Ruolo |
 | --- | --- | --- | --- | --- |
 | **Claude Fable 5.2** | `copilot-frontier` | **$8 / $40** | Valutazione delle capacità frontier sui task più difficili di reasoning, architettura e agentici prima di qualsiasi rollout più ampio; non per il lavoro di routine | **Escalation frontier (solo governance)** |
+| **Gemini 4 Argon** | `copilot-auditors` | **$2 / $10**<br>🏷️ promo fino al 01/12/2026 | Audit e confronto del comportamento dei modelli Google su reasoning complesso e task multi-step; usa Gemini 4 Carbon per il lavoro di routine<br>⚠️ Il prezzo promozionale termina il 2026-12-01 e il prezzo post-promo non è pubblicato; rivalutare quando lo sarà | **Add-on Google potente (solo per auditor)** |
 
-_Aggiornato il 24/11/2026. Fonte: [config/copilot-models.yaml](https://github.com/AgicCompany/org-github-management/blob/main/config/copilot-models.yaml)._
+_Aggiornato il 25/11/2026. Fonte: [config/copilot-models.yaml](https://github.com/AgicCompany/org-github-management/blob/main/config/copilot-models.yaml)._
 
 \* Costi in AI credits per 1M token (input / output), 1 credit = $0,01. Dove indicato, il prezzo cambia oltre una soglia di contesto (es. >272K token).
