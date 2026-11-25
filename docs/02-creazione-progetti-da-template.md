@@ -40,8 +40,11 @@ viste, campi e configurazione vengono duplicati al momento della creazione.
 ### Workflow di progetto richiesti sui template
 
 La copia include anche i workflow di progetto (*⋯ → Workflows*). Su entrambi i template deve essere
-attivo **Item added to project → Status: Backlog**: un'issue aggiunta al board riceve lo status nativo
-`Backlog`, ma senza questo workflow la card resta nella colonna *No Status*. I workflow si configurano
+attivo **Item added to project → Status: Backlog**, applicato **solo alle Issues**: un'issue aggiunta al
+board riceve lo status nativo `Backlog`, ma senza questo workflow la card resta nella colonna *No Status*.
+Le pull request non hanno uno status nativo: il loro avanzamento si riflette sull'issue collegata (PR in
+bozza → In progress, pronta per la review → In review, merge → Done), per questo non vanno in Backlog e
+conviene non aggiungerle al board (filtro `is:issue` in *Auto-add to project*). I workflow si configurano
 **solo da UI**.
 
 ## Metodo A — Da UI (semplice)
