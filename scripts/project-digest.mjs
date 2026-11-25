@@ -13,7 +13,7 @@
  * Lo stato (ON_TRACK / AT_RISK / OFF_TRACK) viene derivato dagli indicatori.
  */
 import {
-  CONFIG, listProjects, getFields, getAllItems, isType, isDone,
+  CONFIG, listProjects, getFields, getAllItems, hasLegacyBoard, isType, isDone, isInProgress, isBlockedItem,
   currentIteration, startOfTodayUTC, daysUntil, isoDate,
   velocityByIteration, projectMethod, throughputByWeek, bar, gql, fail,
 } from './lib/projects.mjs';
@@ -35,7 +35,7 @@ function computeIndicators(items, fields) {
       else if (d <= CONFIG.dueSoonDays) dueSoon++;
     }
     if (!done && isType(it, CONFIG.impedimentTypes)) impediments++;
-    if (CONFIG.inProgressStatuses.includes(it.status)) inProgress++;
+    if (isInProgress(it)) inProgress++;
 
     if (cur && it.iterationId === cur.id) {
       sprintTotal++;
@@ -102,8 +102,8 @@ function computeKanbanIndicators(items, throughputRows) {
       else if (d <= CONFIG.dueSoonDays) dueSoon++;
     }
     if (!done && isType(it, CONFIG.impedimentTypes)) impediments++;
-    if (CONFIG.blockedStatuses.includes(it.status)) blocked++;
-    else if (CONFIG.inProgressStatuses.includes(it.status)) wip++;
+    if (isBlockedItem(it)) blocked++;
+    else if (isInProgress(it)) wip++;
   }
   const lastFullWeek = throughputRows.length >= 2 ? throughputRows[throughputRows.length - 2].completed : 0;
   return { overdue, dueSoon, impediments, wip, blocked, lastFullWeek };
@@ -165,8 +165,7 @@ async function postStatusUpdate(projectId, status, body, startDate, targetDate) 
     if (p.itemCount === 0) { skipped++; continue; }
     try {
       const fields = await getFields(p.id);
-      if (!fields[CONFIG.fieldNames.status]) { skipped++; continue; } // non gestito a board
-      const items = await getAllItems(p.id);
+      const items = await getAllItems(p.id, { legacyBoard: hasLegacyBoard(fields) });
       const method = projectMethod(fields);
 
       let status, body, sd, td, logExtra;

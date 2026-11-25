@@ -21,6 +21,9 @@
  * effettivi configurati sul progetto a cui applichi le regole.
  * -------------------------------------------------------------------------
  */
+import {
+  resolveCategory, isBlocked, isClosedCategory, isStartedCategory, isNotStartedCategory, isNativeMirror,
+} from './lib/status.mjs';
 
 // ===================== CONFIG =====================
 const CONFIG = {
@@ -29,20 +32,13 @@ const CONFIG = {
   staleDays: 5,               // (4) "Fermo": In Progress senza update da N giorni
   impedimentMaxAgeDays: 3,    // (6) "Impediment bloccante": aperto da piu di N giorni
   highPriorityBacklogDays: 5, // (7) "Priorita alta in backlog": in backlog da N giorni
-  blockedMaxAgeDays: 2,       // (Kanban) "Bloccato": in stato Blocked da piu di N giorni
+  blockedMaxAgeDays: 2,       // "Bloccato": label "blocked" e nessun aggiornamento da piu di N giorni
   sprintProgressThreshold: 0.7, // (8) sprint considerato "quasi concluso" oltre questa frazione trascorsa
   lowProgressPercent: 50,     // (8) sotto questa % di sub-issue completate scatta l'alert
 
-  // --- Mappatura valori dei campi single-select (ADATTA AI TUOI VALORI) ---
-  // Unione stati Scrum + Kanban: gli stati non presenti in un metodo semplicemente non fanno match.
-  // Stati che NON contano come "iniziati" (backlog / da fare) - Scrum + Kanban (Backlog, Ready)
-  notStartedStatuses: ['New', 'In analysis', 'Ready to work', 'Approved', 'To Do', 'Backlog', 'Ready'],
-  // Stati di lavorazione attiva - Scrum + Kanban (In Review)
-  inProgressStatuses: ['In Progress', 'Ready for qa', 'In Review'],
-  // Stati "chiusi": nessun alert
-  doneStatuses: ['Done', 'Removed'],
-  // Stati "bloccato" (Kanban): item fermo per un ostacolo
-  blockedStatuses: ['Blocked'],
+  // --- Stati: derivano dallo status nativo delle issue (vedi lib/status.mjs) ---
+  // "Non iniziato" = Backlog/Todo · "In lavorazione" = In progress/In review · "Chiuso" = Done/Not planned/Duplicate.
+  // "Bloccato" = label "blocked" (lo status nativo non ha uno stato Blocked).
   // Valori di Priority considerati "alti" (valori reali org: Urgent/High; fallback generici inclusi)
   highPriorityValues: ['Urgent', 'High', 'P0', 'P1'],
   // Valori di Severity considerati "critici" (valori reali org: "1 - Critical"/"2 - High"; fallback generici inclusi)
@@ -76,7 +72,7 @@ const ALERT_DEFS = [
   { key: 'overdue',        name: '🔴 Scaduto',                  color: 'RED',    description: 'Item aperto con target date superata' },
   { key: 'critical_bug',   name: '🔴 Bug critico aperto',       color: 'RED',    description: 'Bug critico non ancora preso in carico' },
   { key: 'impediment',     name: '🔴 Impediment bloccante',     color: 'RED',    description: 'Impediment aperto da troppo tempo' },
-  { key: 'blocked',        name: '🔴 Bloccato',                 color: 'RED',    description: 'Item in stato Blocked da troppo tempo (Kanban)' },
+  { key: 'blocked',        name: '🔴 Bloccato',                 color: 'RED',    description: 'Item con label blocked da troppo tempo' },
   { key: 'due_soon',       name: '🟠 In scadenza',              color: 'ORANGE', description: 'Target date entro pochi giorni' },
   { key: 'stale',          name: '🟠 Fermo',                    color: 'ORANGE', description: 'In Progress senza aggiornamenti' },
   { key: 'high_backlog',   name: '🟠 Priorita alta in backlog', color: 'ORANGE', description: 'Alta priorita ferma in backlog' },
@@ -286,8 +282,10 @@ async function processProject(projectId, dryRun, quiet) {
     if (optByName[a.name]) keyToOptionId[a.key] = optByName[a.name];
   }
 
-  const ctx = buildContext(fields);
-  const items = await getAllItems(projectId);
+  const ctx = { ...buildContext(fields), availableKeys: new Set(Object.keys(keyToOptionId)) };
+  const statusOpts = fields[CONFIG.fieldNames.status]?.options?.map(o => o.name) || [];
+  const legacyBoard = statusOpts.length > 0 && !isNativeMirror(statusOpts);
+  const items = await getAllItems(projectId, legacyBoard);
 
   let changed = 0, cleared = 0, unchanged = 0;
   for (const it of items) {
@@ -336,8 +334,9 @@ function buildContext(fields) {
 
 // ===================== Regole =====================
 function evaluate(it, ctx) {
-  const status = it.status;
-  if (CONFIG.doneStatuses.includes(status)) return null; // item chiuso: nessun alert
+  const cat = it.statusCategory;
+  if (it.closed || isClosedCategory(cat)) return null; // item chiuso: nessun alert
+  const notStarted = !it.blocked && isNotStartedCategory(cat);
 
   // (1) Scaduto
   if (it.targetDate && dateOnly(it.targetDate) < ctx.today) return 'overdue';
@@ -345,14 +344,15 @@ function evaluate(it, ctx) {
   // (3) Bug critico non gestito
   if (isType(it, CONFIG.bugTypes)
       && CONFIG.criticalSeverityValues.includes(it.severity)
-      && CONFIG.notStartedStatuses.includes(status)) return 'critical_bug';
+      && notStarted) return 'critical_bug';
 
   // (6) Impediment aperto da troppo tempo
   if (isType(it, CONFIG.impedimentTypes)
       && ageDays(it.createdAt, ctx.today) > CONFIG.impedimentMaxAgeDays) return 'impediment';
 
-  // (Kanban) Item fermo nello stato "Blocked" da troppo tempo
-  if (CONFIG.blockedStatuses.includes(status)
+  // Item bloccato (label "blocked") da troppo tempo; solo dove esiste l'opzione Alert "Bloccato",
+  // altrimenti la regola non deve nascondere gli alert successivi.
+  if (it.blocked && ctx.availableKeys.has('blocked')
       && ageDays(it.updatedAt, ctx.today) > CONFIG.blockedMaxAgeDays) return 'blocked';
 
   // (2) In scadenza
@@ -361,13 +361,13 @@ function evaluate(it, ctx) {
     if (d >= 0 && d <= CONFIG.dueSoonDays) return 'due_soon';
   }
 
-  // (4) Fermo (In Progress senza update)
-  if (CONFIG.inProgressStatuses.includes(status)
+  // (4) Fermo (In progress / In review senza update)
+  if (!it.blocked && isStartedCategory(cat)
       && ageDays(it.updatedAt, ctx.today) > CONFIG.staleDays) return 'stale';
 
   // (7) Priorita alta ferma in backlog
   if (CONFIG.highPriorityValues.includes(it.priority)
-      && CONFIG.notStartedStatuses.includes(status)
+      && notStarted
       && ageDays(it.createdAt, ctx.today) > CONFIG.highPriorityBacklogDays) return 'high_backlog';
 
   // (5) Item nello sprint corrente non pronto
@@ -398,7 +398,7 @@ function ageDays(iso, today) { if (!iso) return 0; return Math.floor((today.getT
 function daysUntil(date, today) { return Math.floor((date.getTime() - today.getTime()) / 86400000); }
 
 // ===================== Items =====================
-async function getAllItems(projectId) {
+async function getAllItems(projectId, legacyBoard = false) {
   const out = [];
   let cursor = null, hasNext = true;
   const q = `
@@ -421,10 +421,11 @@ async function getAllItems(projectId) {
               content {
                 __typename
                 ... on Issue {
-                  number title createdAt updatedAt
+                  number title createdAt updatedAt closed stateReason
+                  status { name category { key } }
                   assignees { totalCount }
                   issueType { name }
-                  labels(first: 20) { nodes { name } }
+                  labels(first: 50) { nodes { name } }
                   subIssuesSummary { total completed percentCompleted }
                   issueFieldValues(first: 30) {
                     nodes {
@@ -443,14 +444,14 @@ async function getAllItems(projectId) {
   while (hasNext) {
     const data = await gql(q, { id: projectId, cursor });
     const conn = data.node.items;
-    for (const n of conn.nodes) out.push(normalizeItem(n));
+    for (const n of conn.nodes) out.push(normalizeItem(n, legacyBoard));
     hasNext = conn.pageInfo.hasNextPage;
     cursor = conn.pageInfo.endCursor;
   }
   return out;
 }
 
-function normalizeItem(node) {
+function normalizeItem(node, legacyBoard) {
   const fv = {};
   let iterationId = null;
   for (const v of node.fieldValues.nodes) {
@@ -463,17 +464,27 @@ function normalizeItem(node) {
   }
   const c = node.content || {};
   const N = CONFIG.fieldNames;
+  const labels = (c.labels?.nodes || []).map(l => l.name);
+  const boardStatus = fv[N.status] ?? null;
   return {
     id: node.id,
     number: c.number ?? null,
     title: c.title ?? '',
     type: c.issueType?.name ?? null,
-    labels: (c.labels?.nodes || []).map(l => l.name),
+    labels,
     createdAt: c.createdAt ?? null,
     updatedAt: c.updatedAt ?? null,
     assignees: c.assignees?.totalCount ?? 0,
     subProgress: c.subIssuesSummary?.total ? c.subIssuesSummary.percentCompleted : null,
-    status: fv[N.status] ?? null,
+    closed: !!c.closed,
+    statusCategory: resolveCategory({
+      nativeCategory: c.status?.category?.key ?? null,
+      projectStatus: boardStatus,
+      closed: !!c.closed,
+      stateReason: c.stateReason ?? null,
+      legacyBoard,
+    }),
+    blocked: isBlocked(labels, boardStatus),
     priority: fv[N.priority] ?? null,
     severity: fv[N.severity] ?? null,
     effort: readIssueNumber(c, N.effort),

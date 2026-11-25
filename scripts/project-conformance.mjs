@@ -18,6 +18,7 @@ import {
   CONFIG, listProjects, getFields, getViews, projectMethod,
   isoDate, startOfTodayUTC, fail,
 } from './lib/projects.mjs';
+import { NATIVE_STATUSES, isNativeName, nativeFromLegacy } from './lib/status.mjs';
 
 const dryRun = process.argv.includes('--dry-run');
 const MD_FILE = process.env.CONFORMANCE_MD || 'metrics/conformance.md';
@@ -26,10 +27,7 @@ const CSV_FILE = process.env.CONFORMANCE_CSV || 'metrics/conformance.csv';
 // --- Standard atteso, derivato dai template #8/#9 ---
 // Campi obbligatori su ogni progetto conforme (hard check).
 const REQUIRED_FIELDS = ['Status', 'Priority', 'Severity', 'Effort level', '🚨 Alert', 'Target date'];
-// Opzioni complete del campo Status (hard check).
-const REQUIRED_STATUS_OPTIONS = ['Backlog', 'Ready', 'In Progress', 'In Review', 'Done', 'Blocked', 'Removed'];
-// Set di default di GitHub per un Project mai configurato.
-const GITHUB_DEFAULT_STATUS = ['Todo', 'In Progress', 'Done'];
+// Il campo Status e' lo specchio dello status nativo delle issue: deve avere esattamente i 7 nomi nativi.
 // Viste attese per metodo (soft check: segnalate come warning, non rompono la conformita').
 const EXPECTED_VIEWS = {
   scrum: ['Backlog', 'Sprint backlog', 'Sprint board', 'Sprint breakdown', 'Roadmap', 'Bug tracking', 'Impediment tracking', 'Alert attivi'],
@@ -47,31 +45,32 @@ function csvCell(v) {
   return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
-const sameSet = (a, b) => a.length === b.length && a.every(x => b.includes(x));
-
-// Classifica il campo Status: standard completo, default GitHub mai configurato,
-// standard incompleto (sottoinsieme dello standard) o workflow personalizzato dal cliente.
-function classifyStatus(statusOpts, missingStatus, extraStatus) {
-  if (missingStatus.length === 0) return 'standard';
-  if (sameSet(statusOpts, GITHUB_DEFAULT_STATUS)) return 'default';
-  if (extraStatus.length > 0) return 'personalizzato';
+// Classifica il campo Status rispetto allo status nativo:
+// - nativo: esattamente i 7 nomi nativi (maiuscole ignorate, come fa GitHub nella sincronizzazione);
+// - da migrare: contiene vecchie opzioni AGIC mappabili (Ready, Blocked, Removed, stati Scrum) -> warning;
+// - non mappabile: contiene opzioni senza equivalente nativo -> gli script non le interpretano;
+// - incompleto: solo nomi nativi, ma non tutti.
+function classifyStatus(missingStatus, extraStatus) {
+  if (missingStatus.length === 0 && extraStatus.length === 0) return 'nativo';
+  if (extraStatus.some(o => !nativeFromLegacy(o))) return 'non mappabile';
+  if (extraStatus.length > 0) return 'da migrare';
   return 'incompleto';
 }
 
 function evaluate(fields, views, method) {
   const missingFields = REQUIRED_FIELDS.filter(f => !fields[f]);
   const statusOpts = (fields['Status']?.options || []).map(o => o.name);
-  const missingStatus = REQUIRED_STATUS_OPTIONS.filter(o => !statusOpts.includes(o));
-  const extraStatus = statusOpts.filter(o => !REQUIRED_STATUS_OPTIONS.includes(o));
-  const statusKind = classifyStatus(statusOpts, missingStatus, extraStatus);
+  const lowerOpts = statusOpts.map(o => o.toLowerCase());
+  const missingStatus = NATIVE_STATUSES.filter(o => !lowerOpts.includes(o.toLowerCase()));
+  const extraStatus = statusOpts.filter(o => !isNativeName(o));
+  const statusKind = classifyStatus(missingStatus, extraStatus);
   const viewNames = views.map(v => v.name);
   const missingViews = (EXPECTED_VIEWS[method] || []).filter(v => !viewNames.includes(v));
-  // Campi = hard. Status: 'standard'/'personalizzato' passano; 'default'/'incompleto' bloccano.
-  // Uno Status personalizzato e' un workflow cliente voluto -> conforme con warning, non gap.
-  const statusOk = statusKind === 'standard' || statusKind === 'personalizzato';
+  // Campi = hard. Status: 'nativo'/'da migrare' passano; 'non mappabile'/'incompleto' bloccano.
+  const statusOk = statusKind === 'nativo' || statusKind === 'da migrare';
   const conformant = missingFields.length === 0 && statusOk;
   const warnings = [];
-  if (statusKind === 'personalizzato') warnings.push('Status personalizzato (workflow cliente)');
+  if (statusKind === 'da migrare') warnings.push(`Status da migrare allo status nativo (opzioni: ${extraStatus.join(', ')})`);
   if (missingViews.length) warnings.push(`viste mancanti: ${missingViews.join(', ')}`);
   return { missingFields, missingStatus, extraStatus, statusKind, missingViews, conformant, warnings };
 }
@@ -85,13 +84,13 @@ function buildMarkdown(rows, snapshot) {
   lines.push(`_Read-only · agg. ${snapshot} · ${rows.length} progetti analizzati · ${nonConf.length} non conformi · ${withWarnings.length} con warning_`);
   lines.push('');
   lines.push('Standard di riferimento: template **#8 agic_scrum** / **#9 agic_kanban**.');
-  lines.push('La conformita\' "hard" richiede tutti i campi obbligatori e uno Status **standard** o **personalizzato**.');
+  lines.push('La conformita\' "hard" richiede tutti i campi obbligatori e uno Status **nativo** o **da migrare**.');
   lines.push('');
-  lines.push('Classificazione Status:');
-  lines.push('- **standard** — le 7 opzioni standard presenti;');
-  lines.push('- **personalizzato** — workflow del cliente diverso ma voluto → conforme, segnalato come warning;');
-  lines.push('- **incompleto** — sottoinsieme dello standard con opzioni mancanti → gap da sanare;');
-  lines.push('- **default** — Status di GitHub mai configurato (Todo/In Progress/Done) → progetto da allineare.');
+  lines.push('Classificazione Status (specchio dello status nativo delle issue):');
+  lines.push('- **nativo** — esattamente le 7 opzioni native (Backlog, Todo, In progress, In review, Done, Not planned, Duplicate);');
+  lines.push('- **da migrare** — vecchie opzioni AGIC mappabili (es. Ready, Blocked, Removed, stati Scrum) → conforme con warning, da migrare;');
+  lines.push('- **non mappabile** — opzioni senza equivalente nativo → gli script non le interpretano;');
+  lines.push('- **incompleto** — solo nomi nativi ma non tutti (es. Status di default di GitHub) → da allineare.');
   lines.push('');
   lines.push('Verdetto: ✅ conforme · ⚠️ conforme con warning · ❌ non conforme.');
   lines.push('');
@@ -107,9 +106,9 @@ function buildMarkdown(rows, snapshot) {
     for (const r of nonConf) {
       const reasons = [];
       if (r.missingFields.length) reasons.push(`campi mancanti: ${r.missingFields.join(', ')}`);
-      if (r.statusKind === 'default') reasons.push('Status di GitHub mai configurato (Todo/In Progress/Done)');
-      else if (r.statusKind === 'incompleto') reasons.push(`opzioni Status mancanti: ${r.missingStatus.join(', ')}`);
-      lines.push(`- **#${r.number} ${r.title}** — ${reasons.join('; ')}. Ricrearlo da template o allineare campi/Status.`);
+      if (r.statusKind === 'non mappabile') reasons.push(`opzioni Status senza equivalente nativo: ${r.extraStatus.filter(o => !nativeFromLegacy(o)).join(', ')}`);
+      else if (r.statusKind === 'incompleto') reasons.push(`opzioni Status native mancanti: ${r.missingStatus.join(', ')}`);
+      lines.push(`- **#${r.number} ${r.title}** — ${reasons.join('; ')}. Ricrearlo da template o migrare lo Status (scripts/migrate-native-status.mjs).`);
     }
     lines.push('');
   }
@@ -138,8 +137,8 @@ function buildMarkdown(rows, snapshot) {
     const flag = !ev.conformant ? 'NON CONFORME' : (ev.warnings.length ? 'WARNING' : 'OK ');
     console.log(`#${p.number} [${method}] ${flag} — ${p.title} (status: ${ev.statusKind})`);
     if (ev.missingFields.length) console.log(`    campi mancanti: ${ev.missingFields.join(', ')}`);
-    if (ev.statusKind === 'incompleto') console.log(`    opzioni Status mancanti: ${ev.missingStatus.join(', ')}`);
-    if (ev.statusKind === 'personalizzato') console.log(`    Status personalizzato (workflow cliente): ${ev.extraStatus.join(', ')}`);
+    if (ev.statusKind === 'incompleto') console.log(`    opzioni Status native mancanti: ${ev.missingStatus.join(', ')}`);
+    if (ev.extraStatus.length) console.log(`    opzioni Status non native (${ev.statusKind}): ${ev.extraStatus.join(', ')}`);
     if (ev.missingViews.length) console.log(`    viste mancanti (warning): ${ev.missingViews.join(', ')}`);
   }
   rows.sort((a, b) => (a.conformant === b.conformant) ? a.number - b.number : (a.conformant ? 1 : -1));
