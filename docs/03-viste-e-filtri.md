@@ -114,6 +114,8 @@ dell'issue). Gli stati sono fissi e uguali per tutti i tipi:
 
 - Il campo **Status** del Project resta come **specchio** con esattamente questi 7 nomi: serve per
   le colonne del board e per i draft. GitHub sincronizza board e issue nei due sensi (pochi secondi).
+  I colori delle opzioni seguono quelli dell'interfaccia GitHub: **verde** per gli stati aperti,
+  **viola** per Done, **grigio** per Not planned e Duplicate.
 - Spostare una card in **Done** chiude l'issue; riportarla in Backlog, In progress o In review la
   riapre. Una PR in bozza collegata porta l'issue in In progress; la PR pronta per la review in In review.
 - **Bloccato** non e uno stato: si usa la label **`blocked`** (l'item resta nel suo stato, di solito

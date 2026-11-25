@@ -12,7 +12,8 @@
  * Fasi (solo con --apply):
  *   0. snapshot JSON del progetto in ./migration-snapshots (backup per il rollback)
  *   1. status nativo delle issue dal valore del board (vecchi nomi -> lib/status.mjs) + label "blocked"
- *   2. opzioni del campo Status sostituite dai 7 nomi nativi, riusando gli ID esistenti (i valori restano)
+ *   2. opzioni del campo Status sostituite dai 7 nomi nativi con i colori standard (lib/status.mjs),
+ *      riusando gli ID esistenti (i valori restano); su un progetto gia migrato aggiorna solo i colori
  *   3. campo Status del board riallineato allo status nativo di ogni issue (e ai nomi nativi per i draft)
  *
  * Regole di sicurezza:
@@ -24,7 +25,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { gql, fail, OWNER } from './lib/projects.mjs';
 import {
-  NATIVE_STATUSES, BLOCKED_LABEL, nativeFromLegacy, isNativeName, isNativeMirror, categoryOfName, isClosedCategory,
+  NATIVE_STATUSES, NATIVE_STATUS_COLORS, BLOCKED_LABEL, nativeFromLegacy, isNativeMirror, categoryOfName, isClosedCategory,
 } from './lib/status.mjs';
 
 const args = process.argv.slice(2);
@@ -106,7 +107,7 @@ function planOptions(options) {
     const lower = name.toLowerCase();
     const o = pick(x => x.name.toLowerCase() === lower) || pick(x => (nativeFromLegacy(x.name) || '').toLowerCase() === lower);
     if (o) used.add(o.id);
-    return { id: o?.id, name, color: o?.color || 'GRAY', description: o?.description || '', from: o?.name ?? null };
+    return { id: o?.id, name, color: NATIVE_STATUS_COLORS[name], description: o?.description || '' };
   });
 }
 
@@ -119,8 +120,11 @@ function report(project, plans, optionPlan, drafts) {
   }
   const blocked = plans.filter(p => p.addBlocked);
   if (blocked.length) console.log(`Label "${BLOCKED_LABEL}" da aggiungere: ${blocked.map(p => p.ref).join(', ')}`);
-  console.log('Opzioni del campo Status (nuovo <- vecchio):');
-  for (const o of optionPlan) console.log(`  ${o.name} <- ${o.from ?? '(nuova)'}`);
+  console.log('Opzioni del campo Status (nuovo [colore] <- vecchio [colore]):');
+  for (const o of optionPlan) {
+    const old = project.field.options.find(x => x.id === o.id);
+    console.log(`  ${o.name} [${o.color}] <- ${old ? `${old.name} [${old.color}]` : '(nuova)'}`);
+  }
   const dropped = project.field.options.filter(o => !optionPlan.some(n => n.id === o.id));
   if (dropped.length) console.log(`  opzioni rimosse: ${dropped.map(o => o.name).join(', ')} (i valori vengono riassegnati in fase 3)`);
 }
@@ -254,7 +258,8 @@ function blockersFor(plans, optionPlan) {
     if (APPLY) process.exitCode = 1;
     return;
   }
-  const alreadyNative = project.field.options.length === NATIVE_STATUSES.length && project.field.options.every(o => isNativeName(o.name));
+  const upToDate = project.field.options.length === NATIVE_STATUSES.length
+    && project.field.options.every(o => NATIVE_STATUS_COLORS[o.name] === o.color);
   if (!APPLY) { console.log('\n[DRY-RUN] Nessuna scrittura. Rilancia con --apply per eseguire.'); return; }
 
   mkdirSync('migration-snapshots', { recursive: true });
@@ -271,7 +276,7 @@ function blockersFor(plans, optionPlan) {
     return;
   }
   console.log('Fase 1 completata: status nativo e label.');
-  if (!alreadyNative) await applyOptions(project.field, optionPlan);
+  if (!upToDate) await applyOptions(project.field, optionPlan);
   console.log('Fase 2 completata: opzioni del campo Status.');
   await new Promise(r => setTimeout(r, 10000)); // attesa della sincronizzazione board <-> nativo
   const oldValues = Object.fromEntries(project.items.map(i => [i.id, i.fieldValueByName?.name ?? null]));

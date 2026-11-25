@@ -15,6 +15,18 @@
 
 export const NATIVE_STATUSES = ['Backlog', 'Todo', 'In progress', 'In review', 'Done', 'Not planned', 'Duplicate'];
 
+// Colori delle opzioni dello Status specchio, allineati all'interfaccia GitHub degli stati nativi:
+// verde = issue aperta, viola = chiusa completata, grigio = chiusa senza completamento.
+export const NATIVE_STATUS_COLORS = {
+  Backlog: 'GREEN',
+  Todo: 'GREEN',
+  'In progress': 'GREEN',
+  'In review': 'GREEN',
+  Done: 'PURPLE',
+  'Not planned': 'GRAY',
+  Duplicate: 'GRAY',
+};
+
 const CATEGORY_BY_NATIVE = {
   backlog: 'backlog',
   todo: 'planned',
