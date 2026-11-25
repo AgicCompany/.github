@@ -28,7 +28,8 @@ configurazione per progetto: i nuovi progetti vengono coperti automaticamente.
   - conteggio di scaduti, in scadenza, impediment aperti, item in corso;
   - mini-tabella **velocity** degli ultimi sprint.
 - **Kanban** — pubblica una status update di **flusso** con:
-  - **WIP** (item in lavorazione), **bloccati**, scaduti, in scadenza, impediment aperti;
+  - **WIP** (status nativo In progress/In review, esclusi i bloccati), **bloccati** (label `blocked`),
+    scaduti, in scadenza, impediment aperti;
   - item **completati la settimana scorsa** e mini-tabella **throughput** delle ultime settimane.
 - **Stato** (badge della status update) derivato automaticamente:
   - `OFF_TRACK` se ci sono item scaduti;
@@ -74,30 +75,59 @@ ereditate dai progetti creati dal template). Per una velocity chart:
 - **Cosa verifica** rispetto ai template `#8 agic_scrum` / `#9 agic_kanban`:
   - **Campi obbligatori** (hard): `Status`, `Priority`, `Severity`, `Effort level`, `🚨 Alert`,
     `Target date`.
-  - **Opzioni del campo Status** — classificate in quattro casi per evitare falsi positivi:
-    - `standard` → le 7 opzioni standard presenti (`Backlog, Ready, In Progress, In Review, Done, Blocked, Removed`);
-    - `personalizzato` → workflow del cliente diverso ma **voluto** (opzioni custom oltre lo standard) → conforme, segnalato come **warning**;
-    - `incompleto` → sottoinsieme dello standard con opzioni mancanti → **gap** da sanare (blocca la conformità);
-    - `default` → Status di GitHub mai configurato (`Todo/In Progress/Done`) → progetto da allineare (blocca la conformità).
+  - **Opzioni del campo Status** — il campo e lo **specchio** dello status nativo delle issue:
+    - `nativo` → esattamente le 7 opzioni native (`Backlog, Todo, In progress, In review, Done, Not planned, Duplicate`);
+    - `da migrare` → contiene vecchie opzioni AGIC mappabili (`Ready`, `Blocked`, `Removed`, stati Scrum) → conforme, segnalato come **warning** finche non si esegue la migrazione;
+    - `non mappabile` → contiene opzioni senza equivalente nativo → gli script non le interpretano (blocca la conformità);
+    - `incompleto` → solo nomi nativi ma non tutti (es. Status di default di GitHub `Todo/In Progress/Done`) → da allineare (blocca la conformità).
   - **Viste attese** (soft, solo warning): set standard Scrum/Kanban (Backlog, board, Roadmap,
     Bug/Impediment tracking, Alert attivi, ecc.).
   - Il **metodo** (Scrum/Kanban) è rilevato automaticamente dalla presenza del campo Iteration.
-- **Verdetto**: ✅ conforme · ⚠️ conforme con warning (Status personalizzato o viste mancanti) ·
-  ❌ non conforme (campi mancanti oppure Status `incompleto`/`default`).
+- **Verdetto**: ✅ conforme · ⚠️ conforme con warning (Status da migrare o viste mancanti) ·
+  ❌ non conforme (campi mancanti oppure Status `non mappabile`/`incompleto`).
 - **Output (due forme):**
   1. **`metrics/conformance.md`** — report leggibile: tabella per progetto (metodo, esito, campi /
      opzioni / viste mancanti) più una sezione con l'azione consigliata per i non conformi.
   2. **`metrics/conformance.csv`** — dati grezzi storicizzabili.
 - **Rimedio**: per i progetti non conformi, ricrearli dal template oppure allineare manualmente i
-  campi/opzioni mancanti. La *riparazione automatica* è volutamente **fuori scope** (rischio di
-  scritture indesiderate su progetti reali).
+  campi/opzioni mancanti. Per lo Status `da migrare` usare lo script di migrazione (sezione sotto).
+  La conformità resta **read-only**: non ripara nulla da sola.
+
+## 🔁 Migrazione allo status nativo delle issue
+
+> ⚠️ Lo status nativo delle issue e in **public preview** (non GA).
+
+- **File**: `scripts/migrate-native-status.mjs` — un progetto per volta, **dry-run per default**.
+- **Cosa fa** (con `--apply`):
+  1. salva uno **snapshot JSON** del progetto in `migration-snapshots/` (escluso da git) per il rollback;
+  2. imposta lo **status nativo** di ogni issue dal valore del board (corrispondenza nella
+     [guida 03](03-viste-e-filtri.md#stati-status-nativo-delle-issue)); issue aperte senza valore →
+     Backlog; issue **chiuse** → sempre lo stato coerente col motivo di chiusura; `Blocked` → label `blocked`;
+  3. sostituisce le opzioni del campo Status con i 7 nomi nativi, **riusando gli ID** delle opzioni
+     esistenti (i valori sugli item restano);
+  4. riallinea il campo Status del board allo status nativo (draft: nome nativo del vecchio valore).
+- **Regole di sicurezza**: non riapre mai un'issue chiusa e non ne cambia il motivo di chiusura;
+  chiude un'issue aperta (board `Done` o `Removed`) solo con `--allow-close`; salta e segnala le issue
+  con valori in conflitto su altri board. Gli item saltati restano invariati sul board per la revisione
+  manuale; se un item saltato usa un'opzione che verrebbe eliminata (es. `Blocked`), lo script si
+  ferma prima di scrivere. Un errore su un singolo item non interrompe la migrazione: viene elencato
+  a fine esecuzione insieme al percorso dello snapshot.
+- **Esecuzione** (in locale, con un token che abbia scope `project` e `repo`):
+  ```powershell
+  $env:GITHUB_TOKEN = gh auth token; $env:PROJECT_OWNER = 'AgicCompany'
+  node scripts/migrate-native-status.mjs --project <n>            # dry-run: legge e stampa il piano
+  node scripts/migrate-native-status.mjs --project <n> --apply    # esegue
+  ```
+- **Passi manuali dopo la migrazione** (non esposti dall'API): aggiornare in UI i filtri delle viste
+  che usano i vecchi nomi (es. `status:Blocked`, `-status:Done,Removed`), le Insights e i limiti WIP
+  delle colonne rinominate; verificare i workflow di progetto (*Item closed*, *Pull request merged*, ...).
 
 ## Credenziali e configurazione
 
 - Usano il secret **`PROJECTS_TOKEN`** (PAT con scope `project` + `read:org`) e le variabili
   `PROJECT_OWNER` / `OWNER_TYPE`, come gli Alert.
-- Vocabolario Scrum condiviso (stati, tipi, nomi campi) nel modulo `scripts/lib/projects.mjs`
-  (oggetto `CONFIG`): adattare ai valori effettivi dei progetti.
+- Nomi dei campi e tipi nel modulo `scripts/lib/projects.mjs` (oggetto `CONFIG`); logica degli stati
+  (status nativo, vecchi nomi, label `blocked`) nel modulo `scripts/lib/status.mjs`.
 
 ## Descrizione nei progetti
 Il comando `setup` (vedi [guida 04](04-project-alerts.md)) scrive nel README di ogni progetto una
@@ -115,6 +145,8 @@ segue il flusso: info progetto → 📈 metrica → ⚙️ impostazioni, per res
 | File | Ruolo |
 |------|-------|
 | `scripts/lib/projects.mjs` | Helper condivisi (GraphQL, item, iteration, throughput, README) |
+| `scripts/lib/status.mjs` | Stati degli item da status nativo, vecchi nomi e label `blocked` (+ test `status.test.mjs`) |
+| `scripts/migrate-native-status.mjs` | Migrazione di un progetto allo status nativo (dry-run per default) |
 | `scripts/project-digest.mjs` | Digest → status update (Scrum/Kanban) |
 | `scripts/project-metrics.mjs` | Velocity (Scrum) / Throughput (Kanban) → README + CSV |
 | `scripts/project-conformance.mjs` | Report read-only di conformità → `metrics/conformance.md` + `.csv` |

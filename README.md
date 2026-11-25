@@ -21,7 +21,9 @@ scripts/                        # logica delle automazioni (Node 20, zero dipend
 ├─ project-digest.mjs           # pubblica lo status update settimanale sui Project
 ├─ project-metrics.mjs          # esporta velocity/throughput per iteration
 ├─ project-conformance.mjs      # report read-only dei progetti fuori standard
-└─ lib/projects.mjs             # funzioni condivise (GraphQL, helper Project)
+├─ migrate-native-status.mjs    # migrazione manuale di un progetto allo status nativo (dry-run di default)
+├─ lib/projects.mjs             # funzioni condivise (GraphQL, helper Project)
+└─ lib/status.mjs               # stati degli item da status nativo delle issue (+ status.test.mjs)
 metrics/
 ├─ velocity.csv                 # storico velocity (progetti Scrum), generato dalle automazioni
 ├─ throughput.csv               # storico throughput settimanale (progetti Kanban), generato al 1° run Kanban
@@ -151,8 +153,11 @@ eseguiti dai workflow schedulati in `.github/workflows/`:
 | `project-digest.mjs` | `project-digest.yml` | Pubblica un **digest settimanale** come *status update* del Project |
 | `project-metrics.mjs` | `project-metrics.yml` | Esporta **velocity** (Scrum) o **throughput** settimanale (Kanban) per progetto nel README e in `metrics/velocity.csv` / `metrics/throughput.csv` |
 | `project-conformance.mjs` | `project-conformance.yml` | Genera un **report read-only di conformità** dei progetti rispetto ai template (campi, opzioni Status, viste) in `metrics/conformance.md` / `.csv`; non modifica i progetti |
+| `migrate-native-status.mjs` | — (manuale) | Migra un progetto allo **status nativo delle issue** (public preview): dry-run per default, `--apply` per eseguire |
 
-La logica condivisa (client GraphQL, helper sui Project) sta in `scripts/lib/projects.mjs`. Tutte le
+La logica condivisa (client GraphQL, helper sui Project) sta in `scripts/lib/projects.mjs`; gli stati
+degli item derivano dallo **status nativo delle issue** tramite `scripts/lib/status.mjs` (test:
+`node --test scripts/lib/status.test.mjs`). Tutte le
 automazioni usano il secret **`PROJECTS_TOKEN`** (vedi *Requisiti tecnici*).
 
 Dettagli operativi: [docs/04 — Project Alerts](docs/04-project-alerts.md) e
