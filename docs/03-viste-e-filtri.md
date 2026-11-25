@@ -33,9 +33,9 @@ Iteration (la stima **Effort (numeric)** resta disponibile come Issue Field).
 | **Bug tracking** | Table | `type:Bug` | Colonne Priority, Severity |
 | **Alert attivi** | Table | `-no:"🚨 Alert"` | Solo item con un alert attivo (vedi [guida 04](04-project-alerts.md)) |
 
-> Nel Kanban il lavoro **scorre** tra gli stati della board (`Backlog → Ready → In Progress →
-> In Review → Done`, piu `Blocked`) senza time-box: non esistono viste Sprint. Il carico si
-> controlla con i **limiti WIP** per colonna, impostabili dalla UI della Board.
+> Nel Kanban il lavoro **scorre** tra gli stati della board (`Backlog → Todo → In progress →
+> In review → Done`; un item bloccato ha la label `blocked`) senza time-box: non esistono viste
+> Sprint. Il carico si controlla con i **limiti WIP** per colonna, impostabili dalla UI della Board.
 
 ## Filtrare per sprint corrente (Scrum)
 
@@ -57,10 +57,10 @@ Senza sprint, il Kanban ragiona per **stato** e **anzianita** nella colonna. Fil
 
 | Filtro | Mostra |
 |--------|--------|
-| `status:"In Progress"` | tutto il lavoro in corso (per controllare il WIP) |
-| `status:Blocked` | item fermi per un impedimento |
-| `-status:Done,Removed` | tutto il lavoro ancora aperto |
-| `no:assignees status:"In Progress"` | item in corso senza responsabile |
+| `status:"In progress"` | tutto il lavoro in corso (per controllare il WIP) |
+| `label:blocked` | item fermi per un impedimento |
+| `-status:Done,"Not planned",Duplicate` | tutto il lavoro ancora aperto |
+| `no:assignees status:"In progress"` | item in corso senza responsabile |
 
 > Il carico si tiene sotto controllo con i **limiti WIP** per colonna (UI della Board) e con le
 > metriche di **throughput** calcolate dalle automazioni (vedi [guida 05](05-automazioni-processo.md)):
@@ -94,17 +94,36 @@ La gerarchia si basa sulle **sub-issues** (relazione parent/child), non sui filt
 | Vedere solo un ramo | Group by Parent + scorri all'Epic |
 | Filtro che include i parent | ❌ Non esiste |
 
-## Stati (campo Status)
+## Stati (status nativo delle issue)
 
-Il campo **Status** e un single-select condiviso da tutti i tipi di issue. Il set di stati dipende
-dal template: nel **Kanban** e snello (`Backlog → Ready → In Progress → In Review → Done`, piu
-`Blocked`); nel **Scrum** puo essere piu esteso, ad esempio:
-New → In analysis → Ready to work → Approved → To Do → In Progress →
-Ready for qa → Validated by QA → Done → Removed.
+> ⚠️ Lo status nativo delle issue e in **public preview** (non GA): GitHub puo cambiarne
+> comportamento e API.
 
-> Differenza da ADO: lo Status e **unico e condiviso** tra tutti i tipi (non esistono stati
-> per-tipo) e non c'e enforcement delle transizioni. Le viste filtrano per tipo, ma lo Status
-> resta lo stesso set per tutti.
+La fonte autorevole dello stato e lo **status nativo dell'issue** (menu in alto nella pagina
+dell'issue). Gli stati sono fissi e uguali per tutti i tipi:
+
+| Status nativo | Significato | Issue |
+|---------------|-------------|-------|
+| Backlog | Da analizzare / non pianificato | aperta |
+| Todo | Pianificato o assegnato (GitHub lo imposta quando si assegna una persona) | aperta |
+| In progress | In lavorazione | aperta |
+| In review | In revisione (es. PR pronta per la review) | aperta |
+| Done | Completato | **chiusa** |
+| Not planned | Non verra svolto (ex `Removed`) | **chiusa** |
+| Duplicate | Duplicato di un'altra issue | **chiusa** |
+
+- Il campo **Status** del Project resta come **specchio** con esattamente questi 7 nomi: serve per
+  le colonne del board e per i draft. GitHub sincronizza board e issue nei due sensi (pochi secondi).
+- Spostare una card in **Done** chiude l'issue; riportarla in Backlog, In progress o In review la
+  riapre. Una PR in bozza collegata porta l'issue in In progress; la PR pronta per la review in In review.
+- **Bloccato** non e uno stato: si usa la label **`blocked`** (l'item resta nel suo stato, di solito
+  In progress).
+- Corrispondenza con i vecchi stati AGIC: `Ready`, `To Do`, `Ready to work`, `Approved` → Todo ·
+  `New`, `In analysis` → Backlog · `Ready for qa`, `Validated by QA` → In review · `Blocked` →
+  In progress + label `blocked` · `Removed` → Not planned.
+
+> Differenza da ADO: lo stato e **unico e condiviso** tra tutti i tipi (non esistono stati
+> per-tipo) e non c'e enforcement delle transizioni.
 
 ## Limiti rispetto ad Azure DevOps
 

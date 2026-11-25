@@ -31,24 +31,26 @@ flowchart LR
 ## Le regole
 
 Le regole sono valutate in ordine di priorita: la **prima che fa match vince** (ogni item
-riceve al massimo un alert, quello piu importante). Gli item in stato chiuso (`Done`,
-`Removed`) non ricevono alert. La colonna **Metodo** indica dove la regola e applicabile.
+riceve al massimo un alert, quello piu importante). Gli item chiusi (status nativo `Done`,
+`Not planned`, `Duplicate`) non ricevono alert. Gli stati si leggono dallo **status nativo**
+dell'issue (vedi [guida 03](03-viste-e-filtri.md#stati-status-nativo-delle-issue)). La colonna
+**Metodo** indica dove la regola e applicabile.
 
 | # | Alert | Colore | Metodo | Condizione | Soglia (default) |
 |---|-------|--------|--------|-----------|------------------|
 | 1 | 🔴 Scaduto | rosso | tutti | Item aperto con `Target date` < oggi | — |
-| 2 | 🔴 Bug critico aperto | rosso | tutti | Tipo Bug + `Severity` critica + stato non iniziato | Severity in 1 - Critical / 2 - High |
+| 2 | 🔴 Bug critico aperto | rosso | tutti | Tipo Bug + `Severity` critica + stato non iniziato (Backlog/Todo) | Severity in 1 - Critical / 2 - High |
 | 3 | 🔴 Impediment bloccante | rosso | tutti | Tipo Impediment aperto da troppo tempo | > 3 giorni |
-| 4 | 🔴 Bloccato | rosso | Kanban | Stato `Blocked` senza aggiornamenti da troppo tempo | > 2 giorni |
+| 4 | 🔴 Bloccato | rosso | Kanban | Label `blocked` senza aggiornamenti da troppo tempo | > 2 giorni |
 | 5 | 🟠 In scadenza | arancio | tutti | `Target date` entro pochi giorni | <= 3 giorni |
-| 6 | 🟠 Fermo | arancio | tutti | Stato In Progress/In Review senza aggiornamenti | > 5 giorni |
-| 7 | 🟠 Priorita alta in backlog | arancio | tutti | `Priority` alta + stato backlog da troppo tempo | > 5 giorni |
+| 6 | 🟠 Fermo | arancio | tutti | Stato In progress/In review (non bloccato) senza aggiornamenti | > 5 giorni |
+| 7 | 🟠 Priorita alta in backlog | arancio | tutti | `Priority` alta + stato Backlog/Todo da troppo tempo | > 5 giorni |
 | 8 | 🟡 Non pronto per sprint | giallo | Scrum | Item nello sprint corrente senza stima (`Effort (numeric)`) o senza assegnatario | — |
 | 9 | 🟡 Avanzamento insufficiente | giallo | Scrum | Epic/Feature nello sprint, a sprint quasi concluso, con sub-issue completate sotto soglia | sprint > 70% trascorso, progresso < 50% |
 
 > L'ordine in tabella riflette la priorita usata dal motore (1 = piu alta). Le regole **Scrum**
 > (8, 9) si attivano solo con un campo Iteration e uno sprint corrente; la regola **Kanban** (4)
-> solo su progetti con lo stato `Blocked`. Il metodo si deduce automaticamente dal progetto.
+> solo su progetti con l'opzione Alert *🔴 Bloccato*. Il metodo si deduce automaticamente dal progetto.
 
 ## Il campo 🚨 Alert
 
@@ -124,7 +126,8 @@ Soglie, stati, valori e mappatura tipi sono nel blocco `CONFIG` in cima a
 `scripts/project-alerts.mjs`:
 
 - soglie temporali (`dueSoonDays`, `staleDays`, `impedimentMaxAgeDays`, `highPriorityBacklogDays`, ...);
-- stati: `notStartedStatuses`, `inProgressStatuses`, `doneStatuses`;
+- stati: derivati dallo status nativo per **categoria** e dalla label `blocked`, in `scripts/lib/status.mjs`
+  (condiviso con digest, metriche e conformita');
 - valori `highPriorityValues` (Priority) e `criticalSeverityValues` (Severity);
 - mappatura tipi `bugTypes`, `impedimentTypes`, `parentTypes` (letti da Issue Type nativo, in fallback dalle label).
 

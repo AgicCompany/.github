@@ -11,6 +11,8 @@
  *   PROJECT_NUMBER                 opzionale (solo per operazioni su singolo project)
  */
 
+import { resolveCategory, isBlocked, isClosedCategory, isStartedCategory, isNativeMirror } from './status.mjs';
+
 export const TOKEN = process.env.GITHUB_TOKEN || process.env.PROJECTS_TOKEN;
 export const OWNER = process.env.PROJECT_OWNER;
 export const OWNER_TYPE = (process.env.OWNER_TYPE || 'organization').toLowerCase();
@@ -27,11 +29,7 @@ export const CONFIG = {
     iteration: 'Iteration',
     alert: '🚨 Alert',
   },
-  doneStatuses: ['Done', 'Removed'],
-  // In Progress + In Review (Kanban) + Ready for qa (Scrum): lavorazione attiva / WIP.
-  inProgressStatuses: ['In Progress', 'Ready for qa', 'In Review'],
-  // Stato "bloccato" (Kanban).
-  blockedStatuses: ['Blocked'],
+  // Gli stati (fatto / in lavorazione / bloccato) derivano dallo status nativo: vedi lib/status.mjs.
   impedimentTypes: ['Impediment'],
   bugTypes: ['Bug'],
   dueSoonDays: 3,
@@ -134,7 +132,13 @@ export async function getViews(projectId) {
 }
 
 // ---- Items ----
-export async function getAllItems(projectId) {
+// true se il campo Status del progetto non e' ancora lo specchio con i 7 nomi nativi.
+export function hasLegacyBoard(fields) {
+  const opts = fields[CONFIG.fieldNames.status]?.options?.map(o => o.name) || [];
+  return opts.length > 0 && !isNativeMirror(opts);
+}
+
+export async function getAllItems(projectId, { legacyBoard = false } = {}) {
   const out = [];
   let cursor = null, hasNext = true;
   const q = `
@@ -157,10 +161,11 @@ export async function getAllItems(projectId) {
               content {
                 __typename
                 ... on Issue {
-                  number title createdAt updatedAt closed closedAt
+                  number title createdAt updatedAt closed closedAt stateReason
+                  status { name category { key } }
                   assignees { totalCount }
                   issueType { name }
-                  labels(first: 20) { nodes { name } }
+                  labels(first: 50) { nodes { name } }
                   subIssuesSummary { total completed percentCompleted }
                   issueFieldValues(first: 30) {
                     nodes {
@@ -179,14 +184,14 @@ export async function getAllItems(projectId) {
   while (hasNext) {
     const data = await gql(q, { id: projectId, cursor });
     const conn = data.node.items;
-    for (const n of conn.nodes) out.push(normalizeItem(n));
+    for (const n of conn.nodes) out.push(normalizeItem(n, legacyBoard));
     hasNext = conn.pageInfo.hasNextPage;
     cursor = conn.pageInfo.endCursor;
   }
   return out;
 }
 
-function normalizeItem(node) {
+function normalizeItem(node, legacyBoard) {
   const fv = {};
   let iterationId = null, iterationTitle = null;
   for (const v of node.fieldValues.nodes) {
@@ -201,19 +206,28 @@ function normalizeItem(node) {
   }
   const c = node.content || {};
   const N = CONFIG.fieldNames;
+  const labels = (c.labels?.nodes || []).map(l => l.name);
+  const boardStatus = fv[N.status] ?? null;
   return {
     id: node.id,
     number: c.number ?? null,
     title: c.title ?? '',
     type: c.issueType?.name ?? null,
-    labels: (c.labels?.nodes || []).map(l => l.name),
+    labels,
     createdAt: c.createdAt ?? null,
     updatedAt: c.updatedAt ?? null,
     closed: !!c.closed,
     closedAt: c.closedAt ?? null,
     assignees: c.assignees?.totalCount ?? 0,
     subProgress: c.subIssuesSummary?.total ? c.subIssuesSummary.percentCompleted : null,
-    status: fv[N.status] ?? null,
+    statusCategory: resolveCategory({
+      nativeCategory: c.status?.category?.key ?? null,
+      projectStatus: boardStatus,
+      closed: !!c.closed,
+      stateReason: c.stateReason ?? null,
+      legacyBoard,
+    }),
+    blocked: isBlocked(labels, boardStatus),
     priority: fv[N.priority] ?? null,
     severity: fv[N.severity] ?? null,
     effort: readIssueNumber(c, N.effort),
@@ -239,7 +253,14 @@ export function isType(it, list) {
   return it.labels.some(l => lower.includes(l.toLowerCase()));
 }
 export function isDone(it) {
-  return it.closed || CONFIG.doneStatuses.includes(it.status);
+  return it.closed || isClosedCategory(it.statusCategory);
+}
+// Lavorazione attiva (WIP): status nativo In progress / In review, escluso il bloccato.
+export function isInProgress(it) {
+  return !isDone(it) && !it.blocked && isStartedCategory(it.statusCategory);
+}
+export function isBlockedItem(it) {
+  return !isDone(it) && it.blocked;
 }
 
 // ---- Iterazioni ----

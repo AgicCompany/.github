@@ -13,7 +13,7 @@
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import {
-  CONFIG, listProjects, getFields, getAllItems, velocityByIteration,
+  listProjects, getFields, getAllItems, hasLegacyBoard, velocityByIteration,
   projectMethod, throughputByWeek,
   isoDate, startOfTodayUTC, upsertReadmeBlock, bar, fail,
 } from './lib/projects.mjs';
@@ -93,8 +93,7 @@ function buildThroughputReadmeBlock(rows) {
   for (const p of projects) {
     if (p.itemCount === 0) { skipped++; continue; }
     const fields = await getFields(p.id);
-    if (!fields[CONFIG.fieldNames.status]) { skipped++; continue; }
-    const items = await getAllItems(p.id);
+    const items = await getAllItems(p.id, { legacyBoard: hasLegacyBoard(fields) });
     const method = projectMethod(fields);
 
     if (method === 'scrum') {
