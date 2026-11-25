@@ -37,6 +37,13 @@ viste, campi e configurazione vengono duplicati al momento della creazione.
 > un modo per "ri-sincronizzare". Conseguenza pratica: **stabilizza il template prima** di
 > creare i progetti di lavoro.
 
+### Workflow di progetto richiesti sui template
+
+La copia include anche i workflow di progetto (*⋯ → Workflows*). Su entrambi i template deve essere
+attivo **Item added to project → Status: Backlog**: un'issue aggiunta al board riceve lo status nativo
+`Backlog`, ma senza questo workflow la card resta nella colonna *No Status*. I workflow si configurano
+**solo da UI**.
+
 ## Metodo A — Da UI (semplice)
 
 1. Vai su *Organizzazione → Projects → New project*.

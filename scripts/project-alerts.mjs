@@ -29,7 +29,7 @@ import {
 const CONFIG = {
   // --- Soglie temporali (giorni) ---
   dueSoonDays: 3,              // (2) "In scadenza": target date entro N giorni
-  staleDays: 5,               // (4) "Fermo": In Progress senza update da N giorni
+  staleDays: 5,               // (4) "Fermo": In progress/In review senza update da N giorni
   impedimentMaxAgeDays: 3,    // (6) "Impediment bloccante": aperto da piu di N giorni
   highPriorityBacklogDays: 5, // (7) "Priorita alta in backlog": in backlog da N giorni
   blockedMaxAgeDays: 2,       // "Bloccato": label "blocked" e nessun aggiornamento da piu di N giorni
