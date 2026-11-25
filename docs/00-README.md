@@ -54,7 +54,7 @@ flowchart TD
 | **Project template** | Clonato alla creazione (viste/campi inclusi) | E una **copia**: modifiche al template NON si propagano ai progetti gia creati |
 | **Viste / filtri** | Configurabili solo da UI | **Non scrivibili via API** |
 | **Campi custom** | Creabili/valorizzabili via API | Le viste no |
-| **Project Alerts** | Workflow schedulato nel repo `.github` aggiorna il campo 🚨 Alert via API | Richiede il secret `PROJECTS_TOKEN` (PAT con scope `project`, `read:org`, `repo`) |
+| **Project Alerts** | Workflow schedulato nel repo `.github` aggiorna il campo 🚨 Alert via API | Richiede il secret `PROJECTS_TOKEN` (fine-grained PAT: Issues read-only + Projects read/write) |
 | **Digest / Metriche** | Workflow schedulati pubblicano status update e metriche — velocity (Scrum) o throughput (Kanban) — su README + CSV | Status update non eseguibili sui Project template |
 
 ## Per iniziare

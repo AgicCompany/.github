@@ -5,7 +5,7 @@
  * (digest, metriche, ecc.). Stesso approccio centralizzato degli alert.
  *
  * Env richieste:
- *   GITHUB_TOKEN / PROJECTS_TOKEN  PAT con scope "project" + "repo" (+ read:org); "repo" serve a leggere le issue private
+ *   GITHUB_TOKEN / PROJECTS_TOKEN  fine-grained PAT (Issues: read, Projects: read/write); Issues serve a leggere le issue private
  *   PROJECT_OWNER                  login owner (es. "AgicCompany")
  *   OWNER_TYPE                     "organization" (default) | "user"
  *   PROJECT_NUMBER                 opzionale (solo per operazioni su singolo project)

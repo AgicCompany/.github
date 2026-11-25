@@ -79,19 +79,26 @@ semplicemente ignorata su quel progetto, senza errori.
 
 ## Credenziali
 
-Il workflow usa il secret **`PROJECTS_TOKEN`**: un **PAT classico** con scope `project` + `read:org` + `repo`.
+Il workflow usa il secret **`PROJECTS_TOKEN`**: un **fine-grained PAT** con permessi minimi:
 
-> Lo scope `repo` serve a leggere il contenuto delle issue nelle repo **private** (status nativo, stato
-> chiuso, label, tipo, assegnatari, stima). Senza, l'API restituisce gli item senza contenuto: le
-> regole lavorano su dati mancanti (es. "Non pronto per sprint" su item stimati e assegnati).
-> `repo` da accesso in scrittura a tutte le repo dell'owner del token: usare un account di servizio
-> con i soli permessi necessari, oppure una GitHub App (evoluzione consigliata).
+| Impostazione | Valore |
+|--------------|--------|
+| Resource owner | `AgicCompany` |
+| Repository access | All repositories (i Project contengono issue di molte repo) |
+| Repository permissions | **Issues: Read-only** (Metadata: Read-only, obbligatorio) |
+| Organization permissions | **Projects: Read and write** |
+
+> Il permesso **Issues: Read-only** serve a leggere il contenuto delle issue nelle repo **private**
+> (status nativo, stato chiuso, label, tipo, assegnatari, stima). Senza, l'API restituisce gli item
+> senza contenuto e le regole lavorano su dati mancanti (es. "Non pronto per sprint" su item stimati e
+> assegnati). Il token non puo modificare codice, issue o impostazioni delle repo.
+> Riferimento: [Authentication (Projects)](https://github.github.com/gh-aw/reference/auth-projects/).
 
 | Domanda | Risposta |
 |---------|----------|
 | Perche non il `GITHUB_TOKEN` di default? | Non puo scrivere i Project a livello di organizzazione. |
-| Perche un PAT dedicato e non un token admin personale? | Privilegio minimo: solo `project`, `read:org` e `repo` (lettura delle issue private), evita di esporre scope `admin:org` in un repo condiviso. |
-| Perche non una GitHub App? | Sarebbe l'opzione piu robusta (identita macchina), ma richiede setup aggiuntivo; scartata per semplicita. Resta l'evoluzione consigliata. |
+| Perche un fine-grained PAT e non un PAT classico? | Privilegio minimo: un PAT classico con scope `repo` darebbe lettura e scrittura su tutte le repo dell'utente; il fine-grained PAT legge solo le issue di AgicCompany e scrive solo sui Project. |
+| Perche non una GitHub App? | Sarebbe l'opzione piu robusta (identita macchina, non legata a una persona), ma richiede setup aggiuntivo e modifiche ai workflow. Resta l'evoluzione consigliata. |
 
 Variabili del repo: `PROJECT_OWNER` (= `AgicCompany`), `OWNER_TYPE` (= `organization`).
 
