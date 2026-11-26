@@ -1,2 +1,2 @@
 snapshot_date,project_number,project_title,iteration_title,iteration_start,iteration_end,committed_sp,completed_sp,committed_items,completed_items,completion_pct
-2026-11-23,52,IP.timevision,Iteration 6,2026-08-27,2026-09-09,0,0,1,0,0
+2026-11-26,52,IP.timevision,Iteration 1,2026-11-16,2026-11-29,0,0,74,3,4
