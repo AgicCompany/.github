@@ -52,19 +52,26 @@ configurazione per progetto: i nuovi progetti vengono coperti automaticamente.
 - Il README riporta anche il link diretto al CSV. La stessa metrica compare in forma sintetica nel
   digest settimanale.
 
-### Grafici interattivi (Insights) — setup UI una-tantum
-Le **Insights** dei Project non sono configurabili via API: si impostano dalla UI (e vengono
-ereditate dai progetti creati dal template). Per una velocity chart:
+### Grafici interattivi (Insights) nei template
+Le **Insights** dei Project non sono configurabili via API: si impostano dalla UI. I template
+contengono già i grafici qui sotto, e un progetto creato da template li riceve con la copia.
+I progetti creati prima del 26/11/2026 non li hanno: si possono ricreare a mano con la stessa
+configurazione (scheda **Insights** → **New chart** → **Configure** e filtro).
 
-1. Apri il progetto → scheda **Insights** → **New chart**.
-2. Layout **Column** (o Bar).
-3. Asse X: **Iteration**; Asse Y: **Sum** di **Effort (numeric)**.
-4. Filtro: `is:done` (o `Status:Done`) per la velocity dei soli completati.
-5. Salva con nome **Velocity**. Aggiungi una seconda chart *committed vs done* se utile.
+| Grafico | Template | Layout | Asse X | Gruppi | Asse Y | Filtro |
+|---|---|---|---|---|---|---|
+| Burn up (predefinito) | entrambi | — | Time | — | — | `is:issue` |
+| **Velocity** | Scrum | Column | Iteration | — | Sum di Effort (numeric) | `status:Done` |
+| **Avanzamento sprint** | Scrum | Stacked column | Iteration | Status | Count of items | `type:"User story","Task","Bug","Impediment"` |
+| **Flusso cumulativo** | Kanban | Stacked area | Time | Status (automatico) | Count of items | — |
+| **Throughput** | Kanban | Line | Time | — | Count of items | `status:Done` |
+| **Carico per persona** | entrambi | Bar | Assignees | Status | Count of items | `-status:Done,"Not planned",Duplicate` |
+| **Bug per severità** | entrambi | Column | Severity | Priority | Count of items | `type:Bug -status:Done,"Not planned",Duplicate` |
+| **Alert attivi** | entrambi | Bar | 🚨 Alert | — | Count of items | `-no:🚨-alert` |
 
-> **Kanban**: al posto della velocity per iteration, crea una chart di **throughput** — asse X
-> per **data di completamento** (o settimana) e conteggio degli item `is:done`, per visualizzare
-> quanti item vengono chiusi nel tempo.
+> Con asse X = **Time** il grafico è storico e GitHub raggruppa per Status. Il **Throughput**
+> mostra quanti item sono in Done nel tempo: la pendenza della linea è il ritmo di
+> completamento. Il dato settimanale esatto è nel CSV `metrics/throughput.csv`.
 
 ## 🔍 Conformità dei progetti (read-only)
 
