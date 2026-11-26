@@ -10,7 +10,7 @@
  *   categoria (category.key), non per nome: GitHub indica che i nomi possono cambiare.
  * - Il campo "Status" del Project resta solo come specchio con i 7 nomi nativi (GitHub lo
  *   sincronizza nei due sensi). Serve per le colonne del board e per i draft.
- * - "Blocked" non esiste nello status nativo: si usa la label BLOCKED_LABEL.
+ * - "Blocked" non esiste nello status nativo: si usa l'Issue Field org-level BLOCKED_FIELD = Yes.
  */
 
 export const NATIVE_STATUSES = ['Backlog', 'Todo', 'In progress', 'In review', 'Done', 'Not planned', 'Duplicate'];
@@ -59,7 +59,9 @@ export const LEGACY_TO_NATIVE = {
   duplicate: 'Duplicate',
 };
 
-export const BLOCKED_LABEL = 'blocked';
+// Issue Field org-level (single select Yes/No) che indica un item bloccato.
+export const BLOCKED_FIELD = 'Blocked';
+export const BLOCKED_YES = 'Yes';
 export const NOT_STARTED_CATEGORIES = ['backlog', 'planned'];
 export const STARTED_CATEGORIES = ['started'];
 export const CLOSED_CATEGORIES = ['completed', 'not_planned', 'duplicate'];
@@ -105,8 +107,9 @@ export function resolveCategory({ nativeCategory, projectStatus, closed, stateRe
   return null;
 }
 
-export function isBlocked(labels = [], projectStatus = null) {
-  return labels.some(l => norm(l) === BLOCKED_LABEL) || norm(projectStatus) === 'blocked';
+// Bloccato: Issue Field "Blocked" = Yes, oppure vecchio valore "Blocked" sul board (progetti non migrati).
+export function isBlocked(blockedValue = null, projectStatus = null) {
+  return norm(blockedValue) === norm(BLOCKED_YES) || norm(projectStatus) === 'blocked';
 }
 
 export const isClosedCategory = c => CLOSED_CATEGORIES.includes(c);

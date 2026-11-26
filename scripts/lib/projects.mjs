@@ -11,7 +11,7 @@
  *   PROJECT_NUMBER                 opzionale (solo per operazioni su singolo project)
  */
 
-import { resolveCategory, isBlocked, isClosedCategory, isStartedCategory, isNativeMirror } from './status.mjs';
+import { resolveCategory, isBlocked, isClosedCategory, isStartedCategory, isNativeMirror, BLOCKED_FIELD } from './status.mjs';
 
 export const TOKEN = process.env.GITHUB_TOKEN || process.env.PROJECTS_TOKEN;
 export const OWNER = process.env.PROJECT_OWNER;
@@ -176,6 +176,7 @@ export async function getAllItems(projectId, { legacyBoard = false } = {}) {
                     nodes {
                       __typename
                       ... on IssueFieldNumberValue { value field { ... on IssueFieldCommon { name } } }
+                      ... on IssueFieldSingleSelectValue { name field { ... on IssueFieldCommon { name } } }
                     }
                   }
                 }
@@ -232,7 +233,7 @@ function normalizeItem(node, legacyBoard) {
       stateReason: c.stateReason ?? null,
       legacyBoard,
     }),
-    blocked: isBlocked(labels, boardStatus),
+    blocked: isBlocked(readIssueSelect(c, BLOCKED_FIELD), boardStatus),
     priority: fv[N.priority] ?? null,
     severity: fv[N.severity] ?? null,
     effort: readIssueNumber(c, N.effort),
@@ -251,7 +252,12 @@ function readIssueNumber(content, name) {
   return null;
 }
 
-// ---- Helpers di tipo/stato ----
+// Legge il valore di un issue field single select (es. "Blocked") dal content dell'Issue.
+function readIssueSelect(content, name) {
+  const v = (content?.issueFieldValues?.nodes || [])
+    .find(x => x.__typename === 'IssueFieldSingleSelectValue' && x.field?.name === name);
+  return v?.name ?? null;
+}
 export function isType(it, list) {
   const lower = list.map(s => s.toLowerCase());
   if (it.type && lower.includes(it.type.toLowerCase())) return true;

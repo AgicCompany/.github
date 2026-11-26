@@ -22,7 +22,7 @@
  * -------------------------------------------------------------------------
  */
 import {
-  resolveCategory, isBlocked, isClosedCategory, isStartedCategory, isNotStartedCategory, isNativeMirror,
+  resolveCategory, isBlocked, isClosedCategory, isStartedCategory, isNotStartedCategory, isNativeMirror, BLOCKED_FIELD,
 } from './lib/status.mjs';
 
 // ===================== CONFIG =====================
@@ -32,13 +32,13 @@ const CONFIG = {
   staleDays: 5,               // (4) "Fermo": In progress/In review senza update da N giorni
   impedimentMaxAgeDays: 3,    // (6) "Impediment bloccante": aperto da piu di N giorni
   highPriorityBacklogDays: 5, // (7) "Priorita alta in backlog": in backlog da N giorni
-  blockedMaxAgeDays: 2,       // "Bloccato": label "blocked" e nessun aggiornamento da piu di N giorni
+  blockedMaxAgeDays: 2,       // "Bloccato": Issue Field Blocked = Yes e nessun aggiornamento da piu di N giorni
   sprintProgressThreshold: 0.7, // (8) sprint considerato "quasi concluso" oltre questa frazione trascorsa
   lowProgressPercent: 50,     // (8) sotto questa % di sub-issue completate scatta l'alert
 
   // --- Stati: derivano dallo status nativo delle issue (vedi lib/status.mjs) ---
   // "Non iniziato" = Backlog/Todo · "In lavorazione" = In progress/In review · "Chiuso" = Done/Not planned/Duplicate.
-  // "Bloccato" = label "blocked" (lo status nativo non ha uno stato Blocked).
+  // "Bloccato" = Issue Field org-level "Blocked" = Yes (lo status nativo non ha uno stato Blocked).
   // Valori di Priority considerati "alti" (valori reali org: Urgent/High; fallback generici inclusi)
   highPriorityValues: ['Urgent', 'High', 'P0', 'P1'],
   // Valori di Severity considerati "critici" (valori reali org: "1 - Critical"/"2 - High"; fallback generici inclusi)
@@ -72,7 +72,7 @@ const ALERT_DEFS = [
   { key: 'overdue',        name: '🔴 Scaduto',                  color: 'RED',    description: 'Item aperto con target date superata' },
   { key: 'critical_bug',   name: '🔴 Bug critico aperto',       color: 'RED',    description: 'Bug critico non ancora preso in carico' },
   { key: 'impediment',     name: '🔴 Impediment bloccante',     color: 'RED',    description: 'Impediment aperto da troppo tempo' },
-  { key: 'blocked',        name: '🔴 Bloccato',                 color: 'RED',    description: 'Item con label blocked da troppo tempo' },
+  { key: 'blocked',        name: '🔴 Bloccato',                 color: 'RED',    description: 'Item con Blocked = Yes da troppo tempo' },
   { key: 'due_soon',       name: '🟠 In scadenza',              color: 'ORANGE', description: 'Target date entro pochi giorni' },
   { key: 'stale',          name: '🟠 Fermo',                    color: 'ORANGE', description: 'In Progress senza aggiornamenti' },
   { key: 'high_backlog',   name: '🟠 Priorita alta in backlog', color: 'ORANGE', description: 'Alta priorita ferma in backlog' },
@@ -350,7 +350,7 @@ function evaluate(it, ctx) {
   if (isType(it, CONFIG.impedimentTypes)
       && ageDays(it.createdAt, ctx.today) > CONFIG.impedimentMaxAgeDays) return 'impediment';
 
-  // Item bloccato (label "blocked") da troppo tempo; solo dove esiste l'opzione Alert "Bloccato",
+  // Item bloccato (Issue Field Blocked = Yes) da troppo tempo; solo dove esiste l'opzione Alert "Bloccato",
   // altrimenti la regola non deve nascondere gli alert successivi.
   if (it.blocked && ctx.availableKeys.has('blocked')
       && ageDays(it.updatedAt, ctx.today) > CONFIG.blockedMaxAgeDays) return 'blocked';
@@ -431,6 +431,7 @@ async function getAllItems(projectId, legacyBoard = false) {
                     nodes {
                       __typename
                       ... on IssueFieldNumberValue { value field { ... on IssueFieldCommon { name } } }
+                      ... on IssueFieldSingleSelectValue { name field { ... on IssueFieldCommon { name } } }
                     }
                   }
                 }
@@ -484,7 +485,7 @@ function normalizeItem(node, legacyBoard) {
       stateReason: c.stateReason ?? null,
       legacyBoard,
     }),
-    blocked: isBlocked(labels, boardStatus),
+    blocked: isBlocked(readIssueSelect(c, BLOCKED_FIELD), boardStatus),
     priority: fv[N.priority] ?? null,
     severity: fv[N.severity] ?? null,
     effort: readIssueNumber(c, N.effort),
@@ -501,6 +502,13 @@ function readIssueNumber(content, name) {
     if (v.__typename === 'IssueFieldNumberValue' && v.field?.name === name) return v.value;
   }
   return null;
+}
+
+// Legge il valore di un issue field single select (es. "Blocked") dal content dell'Issue.
+function readIssueSelect(content, name) {
+  const v = (content?.issueFieldValues?.nodes || [])
+    .find(x => x.__typename === 'IssueFieldSingleSelectValue' && x.field?.name === name);
+  return v?.name ?? null;
 }
 
 // ===================== Mutations =====================
