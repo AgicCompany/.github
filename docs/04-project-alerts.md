@@ -41,7 +41,7 @@ dell'issue (vedi [guida 03](03-viste-e-filtri.md#stati-status-nativo-delle-issue
 | 1 | 🔴 Scaduto | rosso | tutti | Item aperto con `Target date` < oggi | — |
 | 2 | 🔴 Bug critico aperto | rosso | tutti | Tipo Bug + `Severity` critica + stato non iniziato (Backlog/Todo) | Severity in 1 - Critical / 2 - High |
 | 3 | 🔴 Impediment bloccante | rosso | tutti | Tipo Impediment aperto da troppo tempo | > 3 giorni |
-| 4 | 🔴 Bloccato | rosso | Kanban | Label `blocked` senza aggiornamenti da troppo tempo | > 2 giorni |
+| 4 | 🔴 Bloccato | rosso | Kanban | Issue Field `Blocked` = `Yes` senza aggiornamenti da troppo tempo | > 2 giorni |
 | 5 | 🟠 In scadenza | arancio | tutti | `Target date` entro pochi giorni | <= 3 giorni |
 | 6 | 🟠 Fermo | arancio | tutti | Stato In progress/In review (non bloccato) senza aggiornamenti | > 5 giorni |
 | 7 | 🟠 Priorita alta in backlog | arancio | tutti | `Priority` alta + stato Backlog/Todo da troppo tempo | > 5 giorni |
@@ -85,13 +85,14 @@ Il workflow usa il secret **`PROJECTS_TOKEN`**: un **fine-grained PAT** con perm
 |--------------|--------|
 | Resource owner | `AgicCompany` |
 | Repository access | All repositories (i Project contengono issue di molte repo) |
-| Repository permissions | **Issues: Read-only** (Metadata: Read-only, obbligatorio) |
+| Repository permissions | **Issues: Read-only**, **Pull requests: Read-only** (Metadata: Read-only, obbligatorio) |
 | Organization permissions | **Projects: Read and write** |
 
 > Il permesso **Issues: Read-only** serve a leggere il contenuto delle issue nelle repo **private**
-> (status nativo, stato chiuso, label, tipo, assegnatari, stima). Senza, l'API restituisce gli item
+> (status nativo, stato chiuso, campo Blocked, tipo, assegnatari, stima); **Pull requests: Read-only**
+> serve per i progetti che contengono anche pull request. Senza, l'API restituisce gli item
 > senza contenuto e le regole lavorano su dati mancanti (es. "Non pronto per sprint" su item stimati e
-> assegnati). Il token non puo modificare codice, issue o impostazioni delle repo.
+> assegnati). Il token non puo modificare codice, issue, pull request o impostazioni delle repo.
 > Riferimento: [Authentication (Projects)](https://github.github.com/gh-aw/reference/auth-projects/).
 
 | Domanda | Risposta |
@@ -139,7 +140,7 @@ Soglie, stati, valori e mappatura tipi sono nel blocco `CONFIG` in cima a
 `scripts/project-alerts.mjs`:
 
 - soglie temporali (`dueSoonDays`, `staleDays`, `impedimentMaxAgeDays`, `highPriorityBacklogDays`, ...);
-- stati: derivati dallo status nativo per **categoria** e dalla label `blocked`, in `scripts/lib/status.mjs`
+- stati: derivati dallo status nativo per **categoria** e dall'Issue Field `Blocked`, in `scripts/lib/status.mjs`
   (condiviso con digest, metriche e conformita');
 - valori `highPriorityValues` (Priority) e `criticalSeverityValues` (Severity);
 - mappatura tipi `bugTypes`, `impedimentTypes`, `parentTypes` (letti da Issue Type nativo, in fallback dalle label).
