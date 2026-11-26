@@ -9,6 +9,7 @@ Al termine avrai un **Project board di lavoro gia pronto**, senza configurazione
 
 - **viste e campi** copiati dal template (Backlog, Sprint/Board, campi Status, Priority, Effort
   level, ecc. a seconda del metodo);
+- i **grafici Insights** del template (velocity o flusso, carico per persona, bug, alert);
 - il campo **🚨 Alert** attivo: gli item a rischio verranno evidenziati in automatico dalle
   automazioni centralizzate;
 - una sezione **⚙️ Automazioni & impostazioni** nella descrizione (README) del board, che spiega cosa
@@ -23,8 +24,8 @@ L'organizzazione espone due Project marcati come *template*, a seconda del metod
 
 | Template | Metodo | Contenuto |
 |----------|--------|-----------|
-| **`agic_scrum_template`** (#8) | Scrum | 8 viste (Backlog, Sprint backlog/board/breakdown, Roadmap, Bug tracking, Impediment tracking, Alert attivi); campi Status (specchio dello status nativo, vedi [guida 03](03-viste-e-filtri.md#stati-status-nativo-delle-issue)), Priority, Effort level, **Iteration**, Severity, Start/Target date, 🚨 Alert. La **stima** usa l'Issue Field org-level **Effort (numeric)** |
-| **`agic_kanban_template`** (#9) | Kanban | 6 viste (Backlog, Board per Status con WIP, Roadmap, Bug tracking, Impediment tracking, Alert attivi); campi Status (specchio dello status nativo: Backlog/Todo/In progress/In review/Done/Not planned/Duplicate), Priority, Effort level, Severity, Start/Target date, 🚨 Alert — **senza** Iteration (usa il throughput) |
+| **`agic_scrum_template`** (#8) | Scrum | 8 viste (Backlog, Sprint backlog/board/breakdown, Roadmap, Bug tracking, Impediment tracking, Alert attivi); campi Status (specchio dello status nativo, vedi [guida 03](03-viste-e-filtri.md#stati-status-nativo-delle-issue)), Priority, Effort level, **Iteration**, Severity, Start/Target date, 🚨 Alert. La **stima** usa l'Issue Field org-level **Effort (numeric)**. Grafici Insights: Burn up, Velocity, Avanzamento sprint, Carico per persona, Bug per severità, Alert attivi ([guida 05](05-automazioni-processo.md#grafici-interattivi-insights-nei-template)) |
+| **`agic_kanban_template`** (#9) | Kanban | 6 viste (Backlog, Board per Status con WIP, Roadmap, Bug tracking, Impediment tracking, Alert attivi); campi Status (specchio dello status nativo: Backlog/Todo/In progress/In review/Done/Not planned/Duplicate), Priority, Effort level, Severity, Start/Target date, 🚨 Alert — **senza** Iteration (usa il throughput). Grafici Insights: Burn up, Flusso cumulativo, Throughput, Carico per persona, Bug per severità, Alert attivi ([guida 05](05-automazioni-processo.md#grafici-interattivi-insights-nei-template)) |
 
 Entrambi partono con **0 item** (sono puliti). Scegli quello adatto al metodo del progetto.
 
