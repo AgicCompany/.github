@@ -7,11 +7,12 @@ con viste e campi gia preconfigurati.
 
 Al termine avrai un **Project board di lavoro gia pronto**, senza configurazione manuale:
 
-- **viste e campi** copiati dal template (Backlog, Sprint/Board, campi Status, Priority, Story
-  Points, ecc. a seconda del metodo);
+- **viste e campi** copiati dal template (Backlog, Sprint/Board, campi Status, Priority, Effort
+  level, ecc. a seconda del metodo);
 - il campo **🚨 Alert** attivo: gli item a rischio verranno evidenziati in automatico dalle
   automazioni centralizzate;
-- una sezione **⚙️ Automazioni** nella descrizione (README) del board, che spiega cosa fa il sistema;
+- una sezione **⚙️ Automazioni & impostazioni** nella descrizione (README) del board, che spiega cosa
+  fa il sistema: e presente nei template e lo step `setup` dello script la scrive o la aggiorna;
 - (con lo script `-CreateRepo`) una **repository gia creata e agganciata** al progetto.
 
 > Un **item** e una voce del Project: tipicamente una issue collegata (o una draft creata nel board).
@@ -23,7 +24,7 @@ L'organizzazione espone due Project marcati come *template*, a seconda del metod
 | Template | Metodo | Contenuto |
 |----------|--------|-----------|
 | **`agic_scrum_template`** (#8) | Scrum | 8 viste (Backlog, Sprint backlog/board/breakdown, Roadmap, Bug tracking, Impediment tracking, Alert attivi); campi Status (specchio dello status nativo, vedi [guida 03](03-viste-e-filtri.md#stati-status-nativo-delle-issue)), Priority, Effort level, **Iteration**, Severity, Start/Target date, 🚨 Alert. La **stima** usa l'Issue Field org-level **Effort (numeric)** |
-| **`agic_kanban_template`** (#9) | Kanban | viste di flusso (Board per Status con WIP, Backlog, Bug tracking, Alert attivi); campi Status (specchio dello status nativo: Backlog/Todo/In progress/In review/Done/Not planned/Duplicate), Priority, Effort level, Severity, Start/Target date, 🚨 Alert — **senza** Iteration (usa il throughput) |
+| **`agic_kanban_template`** (#9) | Kanban | 6 viste (Backlog, Board per Status con WIP, Roadmap, Bug tracking, Impediment tracking, Alert attivi); campi Status (specchio dello status nativo: Backlog/Todo/In progress/In review/Done/Not planned/Duplicate), Priority, Effort level, Severity, Start/Target date, 🚨 Alert — **senza** Iteration (usa il throughput) |
 
 Entrambi partono con **0 item** (sono puliti). Scegli quello adatto al metodo del progetto.
 
@@ -39,9 +40,17 @@ viste, campi e configurazione vengono duplicati al momento della creazione.
 
 ### Workflow di progetto richiesti sui template
 
-La copia include anche i workflow di progetto (*⋯ → Workflows*). Su entrambi i template deve essere
-attivo **Item added to project → Status: Backlog**, applicato **solo alle Issues**: un'issue aggiunta al
-board riceve lo status nativo `Backlog`, ma senza questo workflow la card resta nella colonna *No Status*.
+La copia include anche i workflow di progetto (*⋯ → Workflows*). Su entrambi i template sono attivi
+solo due workflow:
+
+- **Auto-add sub-issues to project**: quando un item entra nel progetto, ci porta anche le sue sub-issue;
+- **Item added to project → Status: Backlog**, applicato **solo alle Issues**: un'issue aggiunta al
+  board riceve lo status nativo `Backlog`, ma senza questo workflow la card resta nella colonna *No Status*.
+
+Gli altri workflow predefiniti (*Item closed*, *Item reopened*, *Pull request linked to issue*,
+*Pull request merged*, *Auto-close issue*) sono spenti: chiusura, riapertura e avanzamento delle issue
+seguono lo status nativo, che GitHub sincronizza con il campo Status del board.
+
 Le pull request non hanno uno status nativo: il loro avanzamento si riflette sull'issue collegata (PR in
 bozza → In progress, pronta per la review → In review, merge → Done), per questo non vanno in Backlog e
 conviene non aggiungerle al board (filtro `is:issue` in *Auto-add to project*). I workflow si configurano
@@ -71,7 +80,7 @@ e, opzionalmente, aggancia subito una repo. Con `-Method` scegli quale template 
 Cosa fa:
 1. `copyProjectV2` dal template scelto → nuovo progetto con viste e campi gia presenti
 2. (opz.) `linkProjectV2ToRepository` → aggancia la repo indicata
-3. **`setup` Alert** → allinea il campo 🚨 Alert e scrive la sezione *⚙️ Automazioni* nella
+3. **`setup` Alert** → allinea il campo 🚨 Alert e scrive la sezione *⚙️ Automazioni & impostazioni* nella
    descrizione (**README del board Project**, non quello della repo — lo si vede aprendo il
    progetto); si salta con `-SkipSetup`.
 
@@ -109,7 +118,7 @@ gia configurati, senza passaggi manuali.
 2. Controlla che ci siano le **viste** del template e la vista *🚨 Alert attivi*.
 3. In una vista, verifica la presenza del campo **🚨 Alert** tra i campi.
 4. Nella **descrizione/README del board** (menu `⋯` → *Settings* del progetto) deve comparire la
-   sezione **⚙️ Automazioni**.
+   sezione **⚙️ Automazioni & impostazioni**.
 5. Se hai usato `-CreateRepo`, la repository risulta **agganciata** (menu progetto → *Settings →
    Repositories*).
 

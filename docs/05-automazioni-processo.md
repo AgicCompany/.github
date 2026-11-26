@@ -28,7 +28,7 @@ configurazione per progetto: i nuovi progetti vengono coperti automaticamente.
   - conteggio di scaduti, in scadenza, impediment aperti, item in corso;
   - mini-tabella **velocity** degli ultimi sprint.
 - **Kanban** — pubblica una status update di **flusso** con:
-  - **WIP** (status nativo In progress/In review, esclusi i bloccati), **bloccati** (label `blocked`),
+  - **WIP** (status nativo In progress/In review, esclusi i bloccati), **bloccati** (Issue Field `Blocked` = `Yes`),
     scaduti, in scadenza, impediment aperti;
   - item **completati la settimana scorsa** e mini-tabella **throughput** delle ultime settimane.
 - **Stato** (badge della status update) derivato automaticamente:
@@ -102,7 +102,7 @@ ereditate dai progetti creati dal template). Per una velocity chart:
   1. salva uno **snapshot JSON** del progetto in `migration-snapshots/` (escluso da git) per il rollback;
   2. imposta lo **status nativo** di ogni issue dal valore del board (corrispondenza nella
      [guida 03](03-viste-e-filtri.md#stati-status-nativo-delle-issue)); issue aperte senza valore →
-     Backlog; issue **chiuse** → sempre lo stato coerente col motivo di chiusura; `Blocked` → label `blocked`;
+     Backlog; issue **chiuse** → sempre lo stato coerente col motivo di chiusura; `Blocked` → Issue Field `Blocked` = `Yes`;
   3. sostituisce le opzioni del campo Status con i 7 nomi nativi e i colori standard, **riusando gli ID**
      delle opzioni esistenti (i valori sugli item restano); su un progetto gia migrato aggiorna solo i colori;
   4. riallinea il campo Status del board allo status nativo (draft: nome nativo del vecchio valore).
@@ -112,7 +112,9 @@ ereditate dai progetti creati dal template). Per una velocity chart:
   manuale; se un item saltato usa un'opzione che verrebbe eliminata (es. `Blocked`), lo script si
   ferma prima di scrivere. Un errore su un singolo item non interrompe la migrazione: viene elencato
   a fine esecuzione insieme al percorso dello snapshot.
-- **Esecuzione** (in locale, con un token che abbia scope `project` e `repo`):
+- **Esecuzione** (in locale, con un token che abbia scope `project` e `repo`; l'account deve avere almeno
+  il ruolo **Triage** su tutte le repo delle issue del progetto, altrimenti lo status nativo di quelle
+  issue non si puo impostare e lo script le segnala come errori):
   ```powershell
   $env:GITHUB_TOKEN = gh auth token; $env:PROJECT_OWNER = 'AgicCompany'
   node scripts/migrate-native-status.mjs --project <n>            # dry-run: legge e stampa il piano
@@ -120,15 +122,16 @@ ereditate dai progetti creati dal template). Per una velocity chart:
   ```
 - **Passi manuali dopo la migrazione** (non esposti dall'API): aggiornare in UI i filtri delle viste
   che usano i vecchi nomi (es. `status:Blocked`, `-status:Done,Removed`), le Insights e i limiti WIP
-  delle colonne rinominate; verificare i workflow di progetto (*Item closed*, *Pull request merged*, ...).
+  delle colonne rinominate; verificare i workflow di progetto (attivi solo *Auto-add sub-issues to project*
+  e *Item added to project* → Backlog, solo Issues, come nei template: vedi [guida 02](02-creazione-progetti-da-template.md#workflow-di-progetto-richiesti-sui-template)).
 
 ## Credenziali e configurazione
 
-- Usano il secret **`PROJECTS_TOKEN`** (fine-grained PAT: Issues read-only sulle repo, Projects read
+- Usano il secret **`PROJECTS_TOKEN`** (fine-grained PAT: Issues e Pull requests read-only sulle repo, Projects read
   and write sull'organizzazione; vedi [guida 04](04-project-alerts.md#credenziali)) e le variabili
   `PROJECT_OWNER` / `OWNER_TYPE`, come gli Alert.
 - Nomi dei campi e tipi nel modulo `scripts/lib/projects.mjs` (oggetto `CONFIG`); logica degli stati
-  (status nativo, vecchi nomi, label `blocked`) nel modulo `scripts/lib/status.mjs`.
+  (status nativo, vecchi nomi, Issue Field `Blocked`) nel modulo `scripts/lib/status.mjs`.
 
 ## Descrizione nei progetti
 Il comando `setup` (vedi [guida 04](04-project-alerts.md)) scrive nel README di ogni progetto una
@@ -146,7 +149,7 @@ segue il flusso: info progetto → 📈 metrica → ⚙️ impostazioni, per res
 | File | Ruolo |
 |------|-------|
 | `scripts/lib/projects.mjs` | Helper condivisi (GraphQL, item, iteration, throughput, README) |
-| `scripts/lib/status.mjs` | Stati degli item da status nativo, vecchi nomi e label `blocked` (+ test `status.test.mjs`) |
+| `scripts/lib/status.mjs` | Stati degli item da status nativo, vecchi nomi e Issue Field `Blocked` (+ test `status.test.mjs`) |
 | `scripts/migrate-native-status.mjs` | Migrazione di un progetto allo status nativo (dry-run per default) |
 | `scripts/project-digest.mjs` | Digest → status update (Scrum/Kanban) |
 | `scripts/project-metrics.mjs` | Velocity (Scrum) / Throughput (Kanban) → README + CSV |

@@ -28,13 +28,15 @@ Iteration (la stima **Effort (numeric)** resta disponibile come Issue Field).
 
 | Vista | Layout | Filtro | Note |
 |-------|--------|--------|------|
-| **Board** | Board | (nessuno) | Column field = Status; vista principale, con limiti **WIP** per colonna |
-| **Backlog** | Table | `type:"Epic","Feature","User story","Task","Bug","Impediment","Spike"` | Coda del lavoro da prendere in carico |
+| **Backlog** | Table | `type:"Epic","Impediment",Bug,Spike` | Elementi di prodotto |
+| **Board** | Board | `type:"User story","Task","Bug","Impediment"` | Column field = Status; vista principale, con limiti **WIP** per colonna |
+| **Roadmap** | Roadmap | `type:Epic,Feature` | Group by Parent issue |
 | **Bug tracking** | Table | `type:Bug` | Colonne Priority, Severity |
+| **Impediment tracking** | Table | `type:Impediment` | — |
 | **Alert attivi** | Table | `-no:"🚨 Alert"` | Solo item con un alert attivo (vedi [guida 04](04-project-alerts.md)) |
 
 > Nel Kanban il lavoro **scorre** tra gli stati della board (`Backlog → Todo → In progress →
-> In review → Done`; un item bloccato ha la label `blocked`) senza time-box: non esistono viste
+> In review → Done`; un item bloccato ha il campo **Blocked** = `Yes`) senza time-box: non esistono viste
 > Sprint. Il carico si controlla con i **limiti WIP** per colonna, impostabili dalla UI della Board.
 
 ## Filtrare per sprint corrente (Scrum)
@@ -58,7 +60,7 @@ Senza sprint, il Kanban ragiona per **stato** e **anzianita** nella colonna. Fil
 | Filtro | Mostra |
 |--------|--------|
 | `status:"In progress"` | tutto il lavoro in corso (per controllare il WIP) |
-| `label:blocked` | item fermi per un impedimento |
+| `blocked:Yes` | item fermi per un impedimento (Issue Field **Blocked**) |
 | `-status:Done,"Not planned",Duplicate` | tutto il lavoro ancora aperto |
 | `no:assignees status:"In progress"` | item in corso senza responsabile |
 
@@ -118,11 +120,12 @@ dell'issue). Gli stati sono fissi e uguali per tutti i tipi:
   **viola** per Done, **grigio** per Not planned e Duplicate.
 - Spostare una card in **Done** chiude l'issue; riportarla in Backlog, In progress o In review la
   riapre. Una PR in bozza collegata porta l'issue in In progress; la PR pronta per la review in In review.
-- **Bloccato** non e uno stato: si usa la label **`blocked`** (l'item resta nel suo stato, di solito
-  In progress).
+- **Bloccato** non e uno stato: si imposta l'Issue Field org-level **Blocked** = `Yes` nella sidebar
+  dell'issue (l'item resta nel suo stato, di solito In progress). Si rimette a `No` quando l'impedimento
+  e risolto. Filtro nelle viste: `blocked:Yes`.
 - Corrispondenza con i vecchi stati AGIC: `Ready`, `To Do`, `Ready to work`, `Approved` → Todo ·
   `New`, `In analysis` → Backlog · `Ready for qa`, `Validated by QA` → In review · `Blocked` →
-  In progress + label `blocked` · `Removed` → Not planned.
+  In progress + Blocked = `Yes` · `Removed` → Not planned.
 
 > Differenza da ADO: lo stato e **unico e condiviso** tra tutti i tipi (non esistono stati
 > per-tipo) e non c'e enforcement delle transizioni.
