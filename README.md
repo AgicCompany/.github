@@ -22,6 +22,7 @@ scripts/                        # logica delle automazioni (Node 20, zero dipend
 ├─ project-metrics.mjs          # esporta velocity/throughput per iteration
 ├─ project-conformance.mjs      # report read-only dei progetti fuori standard
 ├─ migrate-native-status.mjs    # migrazione manuale di un progetto allo status nativo (dry-run di default)
+├─ changelog-watch.mjs          # avvisa (issue) sui nuovi annunci GitHub Changelog sullo status nativo
 ├─ lib/projects.mjs             # funzioni condivise (GraphQL, helper Project)
 └─ lib/status.mjs               # stati degli item da status nativo delle issue (+ status.test.mjs)
 metrics/
@@ -157,6 +158,7 @@ eseguiti dai workflow schedulati in `.github/workflows/`:
 | `project-metrics.mjs` | `project-metrics.yml` | Esporta **velocity** (Scrum) o **throughput** settimanale (Kanban) per progetto nel README e in `metrics/velocity.csv` / `metrics/throughput.csv` |
 | `project-conformance.mjs` | `project-conformance.yml` | Genera un **report read-only di conformità** dei progetti rispetto ai template (campi, opzioni Status, viste) in `metrics/conformance.md` / `.csv`; non modifica i progetti |
 | `migrate-native-status.mjs` | — (manuale) | Migra un progetto allo **status nativo delle issue** (public preview): dry-run per default, `--apply` per eseguire |
+| `changelog-watch.mjs` | `github-changelog-watch.yml` | Ogni giorno legge il **GitHub Changelog** e apre un'issue (label `changelog-watch`, assegnata a `CHANGELOG_NOTIFY_USERS`) per ogni nuovo annuncio sullo status nativo delle issue |
 
 La logica condivisa (client GraphQL, helper sui Project) sta in `scripts/lib/projects.mjs`; gli stati
 degli item derivano dallo **status nativo delle issue** tramite `scripts/lib/status.mjs` (test:

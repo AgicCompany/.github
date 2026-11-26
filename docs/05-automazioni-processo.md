@@ -122,6 +122,17 @@ ereditate dai progetti creati dal template). Per una velocity chart:
   che usano i vecchi nomi (es. `status:Blocked`, `-status:Done,Removed`), le Insights e i limiti WIP
   delle colonne rinominate; verificare i workflow di progetto (*Item closed*, *Pull request merged*, ...).
 
+## 🔔 Avvisi sul GitHub Changelog (status nativo)
+
+- **File**: `scripts/changelog-watch.mjs` + `.github/workflows/github-changelog-watch.yml` (ogni giorno alle 07:00 UTC).
+- **Cosa fa**: legge il feed RSS del [GitHub Changelog](https://github.blog/changelog/) e, per ogni annuncio
+  nuovo su status nativo delle issue, board di repository o sincronizzazione con i Project, apre un'issue in
+  questa repo con label `changelog-watch`, assegnata agli utenti della variabile `CHANGELOG_NOTIFY_USERS`
+  (default `alessiooliverioagic`). Un annuncio genera una sola issue; gli annunci precedenti a `CUTOFF` sono ignorati.
+- **Scopo**: lo status nativo e' in **public preview**; un annuncio (es. GA o cambio di API) puo richiedere di
+  aggiornare `scripts/lib/status.mjs`, lo script di migrazione, le guide e i template.
+- **Credenziali**: usa il `GITHUB_TOKEN` del workflow (permesso `issues: write`), non `PROJECTS_TOKEN`.
+
 ## Credenziali e configurazione
 
 - Usano il secret **`PROJECTS_TOKEN`** (fine-grained PAT: Issues read-only sulle repo, Projects read
