@@ -35,8 +35,9 @@ test('legacy names map to native names, unknown names do not', () => {
   assert.equal(nativeFromLegacy('Rolling out'), null);
 });
 
-test('blocked comes from the label or the legacy board value', () => {
-  assert.equal(isBlocked(['Blocked']), true);
-  assert.equal(isBlocked([], 'Blocked'), true);
-  assert.equal(isBlocked(['bug'], 'In progress'), false);
+test('blocked comes from the Blocked issue field or the legacy board value', () => {
+  assert.equal(isBlocked('Yes'), true);
+  assert.equal(isBlocked(null, 'Blocked'), true);
+  assert.equal(isBlocked('No', 'In progress'), false);
+  assert.equal(isBlocked(null, null), false);
 });

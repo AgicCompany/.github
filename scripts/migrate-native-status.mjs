@@ -11,7 +11,7 @@
  *
  * Fasi (solo con --apply):
  *   0. snapshot JSON del progetto in ./migration-snapshots (backup per il rollback)
- *   1. status nativo delle issue dal valore del board (vecchi nomi -> lib/status.mjs) + label "blocked"
+ *   1. status nativo delle issue dal valore del board (vecchi nomi -> lib/status.mjs) + Issue Field "Blocked" = Yes
  *   2. opzioni del campo Status sostituite dai 7 nomi nativi con i colori standard (lib/status.mjs),
  *      riusando gli ID esistenti (i valori restano); su un progetto gia migrato aggiorna solo i colori
  *   3. campo Status del board riallineato allo status nativo di ogni issue (e ai nomi nativi per i draft)
@@ -25,7 +25,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { gql, fail, OWNER } from './lib/projects.mjs';
 import {
-  NATIVE_STATUSES, NATIVE_STATUS_COLORS, BLOCKED_LABEL, nativeFromLegacy, isNativeMirror, categoryOfName, isClosedCategory,
+  NATIVE_STATUSES, NATIVE_STATUS_COLORS, BLOCKED_FIELD, BLOCKED_YES, nativeFromLegacy, isNativeMirror, categoryOfName, isClosedCategory,
 } from './lib/status.mjs';
 
 const args = process.argv.slice(2);
@@ -40,7 +40,8 @@ const ITEM_Q = `query($o:String!,$n:Int!,$c:String){ organization(login:$o){ pro
     fieldValueByName(name:"Status"){ ... on ProjectV2ItemFieldSingleSelectValue{ name optionId } }
     content{ __typename
       ... on Issue{ id number state stateReason url duplicateOf{ id }
-        repository{ id nameWithOwner } labels(first:50){ nodes{ name } }
+        repository{ id nameWithOwner }
+        issueFieldValues(first:30){ nodes{ ... on IssueFieldSingleSelectValue{ name field{ ... on IssueFieldCommon{ name } } } } }
         status{ id name category{ key } }
         projectItems(first:50){ totalCount nodes{ project{ id }
           fieldValueByName(name:"Status"){ ... on ProjectV2ItemFieldSingleSelectValue{ name } } } } }
@@ -119,7 +120,7 @@ function report(project, plans, optionPlan, drafts) {
     console.log(`  [${p.plan.action}] ${p.ref} board=${p.board ?? '-'} nativo=${p.native ?? '-'} -> ${p.plan.target ?? '-'} ${p.plan.note || ''}`);
   }
   const blocked = plans.filter(p => p.addBlocked);
-  if (blocked.length) console.log(`Label "${BLOCKED_LABEL}" da aggiungere: ${blocked.map(p => p.ref).join(', ')}`);
+  if (blocked.length) console.log(`Issue Field "${BLOCKED_FIELD}" = ${BLOCKED_YES} da impostare: ${blocked.map(p => p.ref).join(', ')}`);
   console.log('Opzioni del campo Status (nuovo [colore] <- vecchio [colore]):');
   for (const o of optionPlan) {
     const old = project.field.options.find(x => x.id === o.id);
@@ -132,7 +133,7 @@ function report(project, plans, optionPlan, drafts) {
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 // Ritenta solo errori transitori (rete, 5xx, HTML, limiti di frequenza). Da usare solo per letture e
-// mutation idempotenti (stesso risultato se ripetute): setIssueStatus, addLabels, valore di un campo.
+// mutation idempotenti (stesso risultato se ripetute): setIssueStatus, setIssueFieldValue, valore di un campo.
 async function gqlRetry(query, vars) {
   for (let attempt = 1; ; attempt++) {
     try { return await gql(query, vars); } catch (e) {
@@ -144,26 +145,13 @@ async function gqlRetry(query, vars) {
   }
 }
 
-async function findLabel(owner, name) {
-  const d = await gqlRetry(`query($o:String!,$r:String!,$l:String!){ repository(owner:$o,name:$r){ id label(name:$l){ id } } }`, { o: owner, r: name, l: BLOCKED_LABEL });
-  return { repoId: d.repository.id, labelId: d.repository.label?.id ?? null };
-}
-
-// createLabel non e' idempotente: niente retry cieco, in caso di errore si verifica se la label esiste gia.
-async function ensureLabel(repo) {
-  const [owner, name] = repo.split('/');
-  const found = await findLabel(owner, name);
-  if (found.labelId) return found.labelId;
-  try {
-    const m = await gql(`mutation($r:ID!,$n:String!){ createLabel(input:{repositoryId:$r,name:$n,color:"b60205",description:"Item bloccato da un ostacolo"}){ label{ id } } }`,
-      { r: found.repoId, n: BLOCKED_LABEL });
-    return m.createLabel.label.id;
-  } catch (e) {
-    await sleep(5000);
-    const again = await findLabel(owner, name);
-    if (again.labelId) return again.labelId;
-    throw e;
-  }
+// ID dell'Issue Field org-level "Blocked" e della sua opzione "Yes".
+async function blockedFieldIds() {
+  const d = await gqlRetry(`query($o:String!){ organization(login:$o){ issueFields(first:50){ nodes{ ... on IssueFieldSingleSelect{ id name options{ id name } } } } } }`, { o: OWNER });
+  const f = d.organization.issueFields.nodes.find(x => x?.name === BLOCKED_FIELD);
+  const yes = f?.options.find(o => o.name === BLOCKED_YES);
+  if (!yes) throw new Error(`Issue Field "${BLOCKED_FIELD}" con opzione "${BLOCKED_YES}" non trovato in ${OWNER}`);
+  return { fieldId: f.id, optionId: yes.id };
 }
 
 // Esegue fn su ogni elemento. Un errore su un item non ferma gli altri: viene raccolto in failures.
@@ -181,7 +169,8 @@ async function write(query, vars) {
 }
 
 async function applyNative(plans, failures) {
-  const idsByRepo = {}, labelByRepo = {};
+  const idsByRepo = {};
+  let blocked = null;
   await eachSafe(plans, failures, p => p.ref, async p => {
     const repo = p.item.content.repository.nameWithOwner;
     if (p.plan.action === 'set') {
@@ -190,9 +179,9 @@ async function applyNative(plans, failures) {
       await write(`mutation($i:ID!,$s:ID!,$d:ID){ setIssueStatus(input:{issueId:$i,statusId:$s,duplicateIssueId:$d}){ clientMutationId } }`, vars);
     }
     if (p.addBlocked) {
-      labelByRepo[repo] ||= await ensureLabel(repo);
-      await write(`mutation($i:ID!,$l:[ID!]!){ addLabelsToLabelable(input:{labelableId:$i,labelIds:$l}){ clientMutationId } }`,
-        { i: p.item.content.id, l: [labelByRepo[repo]] });
+      blocked ||= await blockedFieldIds();
+      await write(`mutation($i:ID!,$f:ID!,$o:ID!){ setIssueFieldValue(input:{issueId:$i,issueFields:[{fieldId:$f,singleSelectOptionId:$o}]}){ clientMutationId } }`,
+        { i: p.item.content.id, f: blocked.fieldId, o: blocked.optionId });
     }
   });
 }
@@ -229,12 +218,12 @@ async function alignBoard(project, oldValues, skippedItemIds, failures) {
 function buildPlans(project) {
   return project.items.filter(i => i.content?.__typename === 'Issue').map(item => {
     const board = item.fieldValueByName?.name ?? null;
-    const labels = item.content.labels.nodes.map(l => l.name.toLowerCase());
+    const blockedNow = (item.content.issueFieldValues?.nodes || []).find(v => v?.field?.name === BLOCKED_FIELD)?.name;
     const plan = planIssue(item, project.id);
     return {
       item, board, plan, native: item.content.status?.name ?? null,
       ref: `${item.content.repository.nameWithOwner}#${item.content.number}`,
-      addBlocked: plan.action !== 'skip' && board?.toLowerCase() === 'blocked' && !labels.includes(BLOCKED_LABEL),
+      addBlocked: plan.action !== 'skip' && board?.toLowerCase() === 'blocked' && blockedNow !== BLOCKED_YES,
     };
   });
 }
