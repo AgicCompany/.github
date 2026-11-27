@@ -40,7 +40,7 @@ const EXPECTED_VIEWS = {
 const HEADERS = [
   'snapshot_date', 'project_number', 'project_title', 'method',
   'conformant', 'status_kind', 'missing_fields', 'missing_status_options',
-  'extra_status_options', 'missing_views',
+  'extra_status_options', 'missing_views', 'project_planning_fields',
 ];
 
 function csvCell(v) {
@@ -113,7 +113,8 @@ function buildMarkdown(rows, snapshot) {
       if (r.missingFields.length) reasons.push(`campi mancanti: ${r.missingFields.join(', ')}`);
       if (r.statusKind === 'non mappabile') reasons.push(`opzioni Status senza equivalente nativo: ${r.extraStatus.filter(o => !nativeFromLegacy(o)).join(', ')}`);
       else if (r.statusKind === 'incompleto') reasons.push(`opzioni Status native mancanti: ${r.missingStatus.join(', ')}`);
-      lines.push(`- **#${r.number} ${r.title}** — ${reasons.join('; ')}. Ricrearlo da template o migrare lo Status (scripts/migrate-native-status.mjs).`);
+      const also = r.projectPlanningFields.length ? ` Inoltre: campi di progetto da sostituire con gli Issue Field: ${r.projectPlanningFields.join(', ')}.` : '';
+      lines.push(`- **#${r.number} ${r.title}** — ${reasons.join('; ')}. Ricrearlo da template o migrare lo Status (scripts/migrate-native-status.mjs).${also}`);
     }
     lines.push('');
   }
@@ -152,6 +153,7 @@ function buildMarkdown(rows, snapshot) {
   const csvRows = rows.map(r => [
     snapshot, r.number, r.title, r.method, r.conformant ? 'yes' : 'no', r.statusKind,
     r.missingFields.join('|'), r.missingStatus.join('|'), r.extraStatus.join('|'), r.missingViews.join('|'),
+    r.projectPlanningFields.join('|'),
   ]);
   const csv = [HEADERS, ...csvRows].map(r => r.map(csvCell).join(',')).join('\n') + '\n';
   const md = buildMarkdown(rows, snapshot);
