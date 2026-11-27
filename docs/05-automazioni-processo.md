@@ -55,8 +55,11 @@ configurazione per progetto: i nuovi progetti vengono coperti automaticamente.
 ### Grafici interattivi (Insights) nei template
 Le **Insights** dei Project non sono configurabili via API: si impostano dalla UI. I template
 contengono già i grafici qui sotto, e un progetto creato da template li riceve con la copia.
-I progetti creati prima del 26/11/2026 non li hanno: si possono ricreare a mano con la stessa
-configurazione (scheda **Insights** → **New chart** → **Configure** e filtro).
+Il 26–27/11/2026 gli stessi grafici sono stati creati anche sui progetti esistenti migrati allo
+status nativo, al posto del grafico generico "Chart 1". I progetti senza i campi Severity, Priority
+e 🚨 Alert hanno solo i grafici che non li usano. Per un progetto che ne è privo, i grafici si
+ricreano a mano con la configurazione della tabella (scheda **Insights** → **New chart** →
+**Configure** e filtro).
 
 | Grafico | Template | Layout | Asse X | Gruppi | Asse Y | Filtro |
 |---|---|---|---|---|---|---|
