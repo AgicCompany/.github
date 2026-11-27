@@ -24,6 +24,7 @@
 import {
   resolveCategory, isBlocked, isClosedCategory, isStartedCategory, isNotStartedCategory, isNativeMirror, BLOCKED_FIELD,
 } from './lib/status.mjs';
+import { planningValue } from './lib/fields.mjs';
 
 // ===================== CONFIG =====================
 const CONFIG = {
@@ -432,6 +433,7 @@ async function getAllItems(projectId, legacyBoard = false) {
                       __typename
                       ... on IssueFieldNumberValue { value field { ... on IssueFieldCommon { name } } }
                       ... on IssueFieldSingleSelectValue { name field { ... on IssueFieldCommon { name } } }
+                      ... on IssueFieldDateValue { dateValue: value field { ... on IssueFieldCommon { name } } }
                     }
                   }
                 }
@@ -486,10 +488,10 @@ function normalizeItem(node, legacyBoard) {
       legacyBoard,
     }),
     blocked: isBlocked(readIssueSelect(c, BLOCKED_FIELD), boardStatus),
-    priority: fv[N.priority] ?? null,
-    severity: fv[N.severity] ?? null,
+    priority: planningValue(c, fv, N.priority),
+    severity: planningValue(c, fv, N.severity),
     effort: readIssueNumber(c, N.effort),
-    targetDate: fv[N.targetDate] ?? null,
+    targetDate: planningValue(c, fv, N.targetDate),
     iterationId,
     alert: fv[N.alert] ?? null,
   };

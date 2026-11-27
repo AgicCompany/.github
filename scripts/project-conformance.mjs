@@ -27,6 +27,9 @@ const CSV_FILE = process.env.CONFORMANCE_CSV || 'metrics/conformance.csv';
 // --- Standard atteso, derivato dai template #8/#9 ---
 // Campi obbligatori su ogni progetto conforme (hard check).
 const REQUIRED_FIELDS = ['Status', 'Priority', 'Severity', 'Effort level', '🚨 Alert', 'Target date'];
+// Campi di pianificazione che devono essere Issue Field di organizzazione (AgicCompany/github-adoption#44):
+// se sul progetto sono ancora campi di progetto il report lo segnala come warning.
+const ISSUE_FIELDS = ['Priority', 'Severity', 'Effort level', 'Start date', 'Target date'];
 // Il campo Status e' lo specchio dello status nativo delle issue: deve avere esattamente i 7 nomi nativi.
 // Viste attese per metodo (soft check: segnalate come warning, non rompono la conformita').
 const EXPECTED_VIEWS = {
@@ -66,13 +69,15 @@ function evaluate(fields, views, method) {
   const statusKind = classifyStatus(missingStatus, extraStatus);
   const viewNames = views.map(v => v.name);
   const missingViews = (EXPECTED_VIEWS[method] || []).filter(v => !viewNames.includes(v));
+  const projectPlanningFields = ISSUE_FIELDS.filter(f => fields[f] && !fields[f].isIssueField);
   // Campi = hard. Status: 'nativo'/'da migrare' passano; 'non mappabile'/'incompleto' bloccano.
   const statusOk = statusKind === 'nativo' || statusKind === 'da migrare';
   const conformant = missingFields.length === 0 && statusOk;
   const warnings = [];
   if (statusKind === 'da migrare') warnings.push(`Status da migrare allo status nativo (opzioni: ${extraStatus.join(', ')})`);
   if (missingViews.length) warnings.push(`viste mancanti: ${missingViews.join(', ')}`);
-  return { missingFields, missingStatus, extraStatus, statusKind, missingViews, conformant, warnings };
+  if (projectPlanningFields.length) warnings.push(`campi di progetto da sostituire con gli Issue Field: ${projectPlanningFields.join(', ')}`);
+  return { missingFields, missingStatus, extraStatus, statusKind, missingViews, projectPlanningFields, conformant, warnings };
 }
 
 function buildMarkdown(rows, snapshot) {
@@ -140,6 +145,7 @@ function buildMarkdown(rows, snapshot) {
     if (ev.statusKind === 'incompleto') console.log(`    opzioni Status native mancanti: ${ev.missingStatus.join(', ')}`);
     if (ev.extraStatus.length) console.log(`    opzioni Status non native (${ev.statusKind}): ${ev.extraStatus.join(', ')}`);
     if (ev.missingViews.length) console.log(`    viste mancanti (warning): ${ev.missingViews.join(', ')}`);
+    if (ev.projectPlanningFields.length) console.log(`    campi di progetto da sostituire con gli Issue Field (warning): ${ev.projectPlanningFields.join(', ')}`);
   }
   rows.sort((a, b) => (a.conformant === b.conformant) ? a.number - b.number : (a.conformant ? 1 : -1));
 
