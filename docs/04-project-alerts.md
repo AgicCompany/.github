@@ -142,6 +142,9 @@ Soglie, stati, valori e mappatura tipi sono nel blocco `CONFIG` in cima a
 - soglie temporali (`dueSoonDays`, `staleDays`, `impedimentMaxAgeDays`, `highPriorityBacklogDays`, ...);
 - stati: derivati dallo status nativo per **categoria** e dall'Issue Field `Blocked`, in `scripts/lib/status.mjs`
   (condiviso con digest, metriche e conformita');
+- `Priority`, `Severity` e `Target date`: vale il campo di progetto, se esiste ed è valorizzato; altrimenti
+  l'Issue Field org-level con lo stesso nome (sidebar dell'issue). Regola in `scripts/lib/fields.mjs`, condivisa
+  con digest e metriche. Quando il campo di progetto viene eliminato resta solo l'Issue Field;
 - valori `highPriorityValues` (Priority) e `criticalSeverityValues` (Severity);
 - mappatura tipi `bugTypes`, `impedimentTypes`, `parentTypes` (letti da Issue Type nativo, in fallback dalle label).
 

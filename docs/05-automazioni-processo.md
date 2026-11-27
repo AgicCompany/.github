@@ -92,8 +92,12 @@ ricreano a mano con la configurazione della tabella (scheda **Insights** → **N
     - `incompleto` → solo nomi nativi ma non tutti (es. Status di default di GitHub `Todo/In Progress/Done`) → da allineare (blocca la conformità).
   - **Viste attese** (soft, solo warning): set standard Scrum/Kanban (Backlog, board, Roadmap,
     Bug/Impediment tracking, Alert attivi, ecc.).
+  - **Campi di pianificazione** (soft, solo warning): `Priority`, `Severity`, `Effort level`, `Start date` e
+    `Target date` devono essere gli Issue Field org-level; se sul progetto sono ancora campi di progetto il report
+    li segnala.
   - Il **metodo** (Scrum/Kanban) è rilevato automaticamente dalla presenza del campo Iteration.
-- **Verdetto**: ✅ conforme · ⚠️ conforme con warning (Status da migrare o viste mancanti) ·
+- **Verdetto**: ✅ conforme · ⚠️ conforme con warning (Status da migrare, viste mancanti o campi di pianificazione
+  ancora di progetto) ·
   ❌ non conforme (campi mancanti oppure Status `non mappabile`/`incompleto`).
 - **Output (due forme):**
   1. **`metrics/conformance.md`** — report leggibile: tabella per progetto (metodo, esito, campi /
@@ -160,6 +164,7 @@ segue il flusso: info progetto → 📈 metrica → ⚙️ impostazioni, per res
 |------|-------|
 | `scripts/lib/projects.mjs` | Helper condivisi (GraphQL, item, iteration, throughput, README) |
 | `scripts/lib/status.mjs` | Stati degli item da status nativo, vecchi nomi e Issue Field `Blocked` (+ test `status.test.mjs`) |
+| `scripts/lib/fields.mjs` | Lettura di Priority, Severity e Target date da campo di progetto o Issue Field (+ test `fields.test.mjs`) |
 | `scripts/migrate-native-status.mjs` | Migrazione di un progetto allo status nativo (dry-run per default) |
 | `scripts/project-digest.mjs` | Digest → status update (Scrum/Kanban) |
 | `scripts/project-metrics.mjs` | Velocity (Scrum) / Throughput (Kanban) → README + CSV |

@@ -12,6 +12,7 @@
  */
 
 import { resolveCategory, isBlocked, isClosedCategory, isStartedCategory, isNativeMirror, BLOCKED_FIELD } from './status.mjs';
+import { planningValue } from './fields.mjs';
 
 export const TOKEN = process.env.GITHUB_TOKEN || process.env.PROJECTS_TOKEN;
 export const OWNER = process.env.PROJECT_OWNER;
@@ -95,7 +96,8 @@ export async function getFields(projectId) {
             nodes {
               __typename
               ... on ProjectV2FieldCommon { id name }
-              ... on ProjectV2SingleSelectField { id name options { id name } }
+              ... on ProjectV2Field { isIssueField }
+              ... on ProjectV2SingleSelectField { id name isIssueField options { id name } }
               ... on ProjectV2IterationField {
                 id name
                 configuration {
@@ -177,6 +179,7 @@ export async function getAllItems(projectId, { legacyBoard = false } = {}) {
                       __typename
                       ... on IssueFieldNumberValue { value field { ... on IssueFieldCommon { name } } }
                       ... on IssueFieldSingleSelectValue { name field { ... on IssueFieldCommon { name } } }
+                      ... on IssueFieldDateValue { dateValue: value field { ... on IssueFieldCommon { name } } }
                     }
                   }
                 }
@@ -234,10 +237,10 @@ function normalizeItem(node, legacyBoard) {
       legacyBoard,
     }),
     blocked: isBlocked(readIssueSelect(c, BLOCKED_FIELD), boardStatus),
-    priority: fv[N.priority] ?? null,
-    severity: fv[N.severity] ?? null,
+    priority: planningValue(c, fv, N.priority),
+    severity: planningValue(c, fv, N.severity),
     effort: readIssueNumber(c, N.effort),
-    targetDate: fv[N.targetDate] ?? null,
+    targetDate: planningValue(c, fv, N.targetDate),
     iterationId,
     iterationTitle,
   };
